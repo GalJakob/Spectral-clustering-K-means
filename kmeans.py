@@ -16,9 +16,6 @@ filename = "input_1.txt"
 #elif ( n == 2):
 #    filename = sys.argv[1]
 
-x = "noa"
-print(x)
-
 input1 = open("input_1.txt")
 
 while input1.readline() != "":
