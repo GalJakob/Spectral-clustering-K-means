@@ -20,10 +20,11 @@ x = "noa"
 print(x)
 
 input1 = open("input_1.txt")
-w = input1.readline().split(",")
-i = 0
 
-while i < len(w):
-  print(w[i])
-  i+=1
-  w = input1.readline()
+while input1.readline() != "":
+  w = input1.readline().split(",")
+  i = 0
+  while i < len(w):
+    print(w[i])
+    i+=1
+
