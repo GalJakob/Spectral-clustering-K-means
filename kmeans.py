@@ -42,28 +42,43 @@ max_iter = math.inf
 iter_cnt = 0
 #iter_cnt < max_iter & Euclidean_norm < epsilon
 
-while epsilon < 1:
+while epsilon < 101:
+
   for point in datapoints_arr:
     min_dis = math.inf
-    for centroid in centroids_arr:
-      temp_dis = math.pow((float(point[0]) - float(centroid[0])), 2) + \
-                 math.pow((float(point[1]) - float(centroid[1])), 2) + \
-                 math.pow((float(point[2]) - float(centroid[2])), 2)
-
+    for c in range(k):
+      temp_dis = 0
+      for l in range(len(point)):
+        temp_dis += math.pow((float(point[l]) - float(centroids_arr[c][l])), 2)
       if temp_dis < min_dis:
-        cluster = centroids_arr.index(centroid)
+        cluster = c
         min_dis = temp_dis
-    clusters[cluster] += point
 
-  for i in range(len(centroids_arr)):
+    clusters[cluster].append(point)
+
+  norm = []
+
+  for i in range(k):
     old_centroid = centroids_arr[i]
     now_cluster = clusters[i]
-    sum = 0
+    sum = [0 for i in range(len(point))]
     for point in now_cluster:
-      sum+= float(point)
-
-    new_centroid = str(sum / (len(now_cluster)))
+      for p in range(len(point)):
+        sum[p]+= float(point[p])
+    sum = [str(float(x)/len(now_cluster)) for x in sum]
+    new_centroid = sum
     centroids_arr[i] = new_centroid
+    distance = 0
+    for l in range(len(point)):
+      distance += math.pow((float(old_centroid[l]) - float(new_centroid[l])), 2)
+    norm.append(distance)
 
-  print(centroids_arr)
+  for i in range(k):
+    Euclidean_norm += norm[i]
+  Euclidean_norm = math.sqrt(Euclidean_norm)
+
+
   epsilon += 1
+print(centroids_arr)
+
+
