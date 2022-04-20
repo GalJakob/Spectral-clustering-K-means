@@ -10,6 +10,7 @@ void assignVars(int *, int *, char **, char **, char **, int);
 void assignPoints(double ***, char **, int *, int *);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
 void initializeCentroids(double ***, double ***, int, int, int);
+void mainAlgorithm(double ***, double ***);
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
     assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords);
     initializeCentroids(&pointsArr, &centroids, K, numOfPoints, numOfCords);
-
+    mainAlgorithm(&pointsArr, &centroids);
 
     return 0;
 }
@@ -117,23 +118,28 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
 
 void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, int numOfCords, int numOfPoints)
 {
-    printf("%d", numOfCords);
-    printf("%d", numOfPoints);
-    /*
-    for (int pointIdx = 0; pointIdx < K; pointIdx++)
-    {
-        for (int cord = 0; cord <5;cord++)
-        {
+    int pointIdx;
+    int cord;
 
-        }
+    *centroidsPtr = (double **)malloc((sizeof(double *)) * K);
+    for (pointIdx = 0; pointIdx < K; pointIdx++)
+    {
+        (*centroidsPtr)[pointIdx] = (double *)malloc(numOfCords * sizeof(double));
+        for (cord = 0; cord < numOfCords; cord++)
+            (*centroidsPtr)[pointIdx][cord] = (*pointArrPtr)[pointIdx][cord];
     }
-     */
+
+    printf("%f", (*centroidsPtr)[K - 1][2]);
 }
 void output(double ***centroidsPtr, int k)
 {
-   /*  for (int i = 0; i < k; i++)
-    {
-         for (int j; j < )
-         *centroidsPtr[i][0] = 
-    } */
+    /*  for (int i = 0; i < k; i++)
+     {
+          for (int j; j < )
+          *centroidsPtr[i][0] =
+     } */
+}
+void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr)
+{
+    
 }
