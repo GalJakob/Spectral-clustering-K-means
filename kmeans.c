@@ -7,15 +7,15 @@
 #define PERCISION 10000
 
 void assignVars(int *, int *, char **, char **, char **, int);
-void assignPoints(float ***, char **);
+void assignPoints(double ***, char **);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
-void computeCentroids(float **, float **);
+void computeCentroids(double **, double **);
 
 int main(int argc, char *argv[])
 {
     int K;
     int max_iter;
-    float **pointsArr;
+    double **pointsArr;
     char *inFileNamePtr;
     char *outFileNamePtr;
 
@@ -46,13 +46,13 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     }
 }
 
-void assignPoints(float ***pointArrPtr, char **inFileNamePtr)
+void assignPoints(double ***pointArrPtr, char **inFileNamePtr)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
 
-    float cordinateVal;
-    float *pointPtr;
+    double cordinateVal;
+    double *pointPtr;
     int numOfCords = 0;
     int numOfCordsIdx = 0;
     int numOfPoints = 0;
@@ -63,12 +63,12 @@ void assignPoints(float ***pointArrPtr, char **inFileNamePtr)
 
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
 
-    *pointArrPtr = (float **)malloc((sizeof(float *)) * numOfPoints);
+    *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
    
     filePtr = fopen(*inFileNamePtr, "r");
     while (fgets(line, LINE_LENGTH, filePtr))
     {
-        (*pointArrPtr)[numOfPointsIdx] = (float *)malloc(numOfCords * sizeof(float));
+        (*pointArrPtr)[numOfPointsIdx] = (double *)malloc(numOfCords * sizeof(double));
 
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
@@ -113,6 +113,6 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     fclose(*filePtr);
 }
 
-void computeCentroids(float **points, float **centroids)
+void computeCentroids(double **points, double **centroids)
 {
 }
