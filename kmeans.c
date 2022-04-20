@@ -4,24 +4,24 @@
 #include <string.h>
 
 #define LINE_LENGTH 256
-#define PERCISION 100
+#define PERCISION 10000
 
 void assignVars(int *, int *, char **, char **, char **, int);
-void assignPoints(float *, char **);
-void computeNumOfCords(FILE **, int *, char ***);
+void assignPoints(float **, char **);
+void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
 
 int main(int argc, char *argv[])
 {
     int K;
     int max_iter;
-    float pointsArr[1][1];
+    float *pointsArr[1];
     char *inFileNamePtr;
     char *outFileNamePtr;
 
+    /* reminder:arr == &arr[0] :*/
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
-    assignPoints(*pointsArr, &inFileNamePtr);
+    assignPoints(pointsArr, &inFileNamePtr);
 
-    printf("%d", pointsArr[0]);
     return 0;
 }
 
@@ -44,7 +44,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     }
 }
 
-void assignPoints(float *pointArrPtr, char **inFileNamePtr)
+void assignPoints(float **pointArrPtr, char **inFileNamePtr)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
@@ -53,16 +53,21 @@ void assignPoints(float *pointArrPtr, char **inFileNamePtr)
     float *pointPtr;
     int numOfCords = 0;
     int numOfCordsIdx = 0;
+    int numOfPoints = 0;
+    int numOfPointsIdx = 0;
 
     FILE *filePtr;
 
-    computeNumOfCords(&filePtr, &numOfCords, &inFileNamePtr);
-    pointPtr = malloc(sizeof(float) * numOfCords);
+    computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
+
+    *pointArrPtr = (float *)malloc((sizeof(float *)) * numOfPoints);
 
     filePtr = fopen(*inFileNamePtr, "r");
-
     while (fgets(line, LINE_LENGTH, filePtr))
     {
+        pointArrPtr[numOfPointsIdx] = malloc(numOfCords * sizeof(float));
+        printf("%s", line);
+
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
             if (numOfCordsIdx == 0)
@@ -70,36 +75,40 @@ void assignPoints(float *pointArrPtr, char **inFileNamePtr)
             else
                 splittedLine = strtok(NULL, ",");
             cordinateVal = strtof(splittedLine, NULL);
-            pointPtr[numOfCordsIdx] = cordinateVal;
+           /*  free(splittedLine); */
+           /*  pointArrPtr[numOfPointsIdx][numOfCordsIdx] = cordinateVal; */
         }
+       /*  free(line); */
+        printf(" %d \n", numOfPointsIdx);
+        numOfPointsIdx++;
         numOfCordsIdx = 0;
-        printf("%f", pointPtr[4]);
-        exit(0);
     }
+    printf("%f", pointArrPtr[2][1]);
     fclose(filePtr);
 }
 
-void computeNumOfCords(FILE **filePtr, int *numOfCords, char ***inFileNamePtr)
+void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoints, char ***inFileNamePtr)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
     *filePtr = fopen(**inFileNamePtr, "r");
-    fgets(line, LINE_LENGTH, *filePtr);
-    do
+    while (fgets(line, LINE_LENGTH, *filePtr))
     {
-        if (*numOfCords == 0)
-            splittedLine = strtok(line, ",");
+        *numOfPoints = *numOfPoints + 1;
+        if (*numOfCords != 0)
+            continue;
         else
-            splittedLine = strtok(NULL, ",");
-        *numOfCords = *numOfCords + 1;
-    } while (splittedLine != NULL);
-    *numOfCords = *numOfCords - 1;
+        {
+            do
+            {
+                if (*numOfCords == 0)
+                    splittedLine = strtok(line, ",");
+                else
+                    splittedLine = strtok(NULL, ",");
+                *numOfCords = *numOfCords + 1;
+            } while (splittedLine != NULL);
+            *numOfCords = *numOfCords - 1;
+        }
+    }
     fclose(*filePtr);
-}
-
-void appendCordsToPoint(float **pointPtr, float cordinateVal, int *numOfCordsPtr)
-{
-    *pointPtr = (float *)realloc(*pointPtr, sizeof(float) * (*numOfCordsPtr + 1));
-    *pointPtr[*numOfCordsPtr] = cordinateVal;
-    *numOfCordsPtr = *numOfCordsPtr + 1;
 }
