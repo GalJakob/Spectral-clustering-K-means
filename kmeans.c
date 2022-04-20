@@ -67,12 +67,11 @@ void assignPoints(float ***pointArrPtr, char **inFileNamePtr)
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
 
     *pointArrPtr = (float **)malloc((sizeof(float *)) * numOfPoints);
-    printf(" %d \n", (*pointArrPtr)[1] - *pointArrPtr);
+   
     filePtr = fopen(*inFileNamePtr, "r");
     while (fgets(line, LINE_LENGTH, filePtr))
     {
-        *pointArrPtr[numOfPointsIdx] = (float *)malloc(numOfCords * sizeof(float));
-        printf("%s", line);
+        (*pointArrPtr)[numOfPointsIdx] = (float *)malloc(numOfCords * sizeof(float));
 
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
@@ -82,14 +81,12 @@ void assignPoints(float ***pointArrPtr, char **inFileNamePtr)
                 splittedLine = strtok(NULL, ",");
             cordinateVal = strtof(splittedLine, NULL);
             /*  free(splittedLine); */
-            /*  pointArrPtr[numOfPointsIdx][numOfCordsIdx] = cordinateVal; */
+            (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
-        /*  free(line); */
-        printf(" %d \n", numOfPointsIdx);
         numOfPointsIdx++;
         numOfCordsIdx = 0;
     }
-    printf("%f", pointArrPtr[2][1]);
+    printf("%f", (*pointArrPtr)[2][2]);
     fclose(filePtr);
 }
 
