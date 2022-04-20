@@ -69,11 +69,11 @@ if len(datapoints_arr) < k:
   sys.exit("Invalid Input!")
 
 epsilon = 0.001
-Euclidean_norm = math.inf
+Euclidean_norm = False
 iter_cnt = 1
 point_len = len(datapoints_arr[0])
 
-while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
+while (iter_cnt != max_iter) and (Euclidean_norm == False):
   c_size = [0 for i in range(k)]
   c_sum = [[0 for o in range(point_len)] for j in range(k)]
 
@@ -112,9 +112,14 @@ while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
 
     norm.append(distance)
 
+  norm = [math.sqrt(i) for i in norm]
+  Euclidean_norm = True
+
   for i in range(k):
-    Euclidean_norm += norm[i]
-  Euclidean_norm = math.sqrt(Euclidean_norm)
+
+    if norm[i] > epsilon:
+      Euclidean_norm = False
+      continue
 
   iter_cnt += 1
 
