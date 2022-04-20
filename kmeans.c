@@ -18,9 +18,6 @@ int main(int argc, char *argv[])
     float **pointsArr;
     char *inFileNamePtr;
     char *outFileNamePtr;
-    float centroids[3][3] = {{-5.1837, 9.7155, 6.2049},
-                             {9.2899, -6.4242, -8.5247},
-                             {9.6935, -5.3730, -8.8493}};
 
     /* reminder:arr == &arr[0] :*/
     printf(" %x \n", pointsArr);
