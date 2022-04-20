@@ -1,28 +1,64 @@
 import sys
 import math
 
-"""n = len(sys.argv)
-k = sys.argv[0]
+n = len(sys.argv)
+if n < 3:
+  sys.exit("Invalid Input")
 
-filename1 = str(sys.argv[2])
+k = sys.argv[0]
+k_num = k.split(".")
+if len(K_num) > 2:
+  sys.exit("Invalid Input!")
+else:
+  for digit in k_num:
+    if not digit.isdigit():
+      sys.exit("Invalid Input!")
+if float(k) < 1 or float(k) != int(k):
+  sys.exit("Invalid Input")
+else:
+  k = int(k)
 
 if n == 3:
-  max_iter = sys.argv[1]
-  filename = sys.argv[2]
+  max_iter = 200
+  input_filename = sys.argv[1]
+  output_filename = sys.argv[2]
 
-elif n == 2:
-  filename = sys.argv[1]
-  max_iter = math.inf
+else:
+  max_iter = sys.argv[1]
+  num = max_iter.split(".")
+  if len(num) > 2:
+    sys.exit("Invalid Input!")
+  else:
+    for digit in num:
+      if not digit.isdigit():
+        sys.exit("Invalid Input!")
+
+  if float(max_iter) < 1 or float(max_iter) != int(max_iter):
+    sys.exit("Invalid Input!")
+  else:
+    max_iter = int(max_iter)
+
+  input_filename = sys.argv[2]
+  output_filename = sys.argv[3]
+
 """
 k=3
-max_iter = 1
-filename = "input_1.txt"
-input1 = open(filename)
+max_iter = 600
+input_filename = "input_1.txt"
+output_filename = "output_11.txt"
+
+"""
 
 datapoints_arr = []
 centroids_arr = []
-clusters = {}
+
 cnt = 0
+
+try:
+  input1 = open(input_filename)
+except IOError:
+  sys.exit("An Error Has Occurred")
+
 
 line1 = input1.readline()
 
@@ -35,10 +71,14 @@ while line1 != "":
 
   if cnt < k:
     centroids_arr.append(line)
-    clusters[cnt] = []
 
   cnt +=1
   line1 = input1.readline()
+
+input1.close()
+
+if len(datapoints_arr) < k:
+  sys.exit("Invalid Input!")
 
 epsilon = 0.001
 Euclidean_norm = math.inf
@@ -46,9 +86,12 @@ iter_cnt = 0
 point_len = len(datapoints_arr[0])
 
 while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
+  c_size = [0 for i in range(k)]
+  c_sum = [[0 for o in range(point_len)] for j in range(k)]
 
   for point in datapoints_arr:
     min_dis = math.inf
+    cluster = 0
 
     for c in range(k):
       temp_dis = 0
@@ -60,22 +103,16 @@ while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
         cluster = c
         min_dis = temp_dis
 
-    clusters[cluster].append(point)
+    for v in range(point_len):
+      c_sum[cluster][v] += float(point[v])
+
+    c_size[cluster] += 1
 
   norm = []
 
   for i in range(k):
     old_centroid = centroids_arr[i]
-    now_cluster = clusters[i]
-    sum = [0 for i in range(point_len)]
-
-    for point in now_cluster:
-
-      for p in range(point_len):
-        sum[p]+= float(point[p])
-
-    sum = [str(float(x)/len(now_cluster)) for x in sum]
-    new_centroid = sum
+    new_centroid = [c_sum[i][j]/c_size[i] for j in range(point_len)]
     centroids_arr[i] = new_centroid
     distance = 0
 
@@ -90,6 +127,17 @@ while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
 
   iter_cnt += 1
 
-print(centroids_arr)
-print(iter_cnt)
+centroids_arr = [[str('%.4f' % (float(centroids_arr[i][j]))) for j in range(point_len)] for i in range(k)]
+
+res = open(output_filename, "w")
+
+for i in range(k):
+  final_line = centroids_arr[i][0]
+  for j in range(1, point_len):
+    final_line += "," + centroids_arr[i][j]
+
+  final_line += "\n"
+  res.write(final_line)
+
+res.close()
 
