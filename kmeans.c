@@ -9,20 +9,23 @@
 void assignVars(int *, int *, char **, char **, char **, int);
 void assignPoints(double ***, char **);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
-void computeCentroids(double **, double **);
+void initializeCentroids(double ***, double ***, int);
 
 int main(int argc, char *argv[])
 {
     int K;
     int max_iter;
     double **pointsArr;
+    double **centroids;
     char *inFileNamePtr;
     char *outFileNamePtr;
 
     /* reminder:arr == &arr[0] :*/
-    printf(" %x \n", pointsArr);
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
     assignPoints(&pointsArr, &inFileNamePtr);
+    initializeCentroids(&pointsArr, &centroids, K);
+
+    printf("%f\n", pointsArr[0][1]);
 
     return 0;
 }
@@ -59,12 +62,11 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr)
     int numOfPointsIdx = 0;
 
     FILE *filePtr;
-    printf(" %x \n", *pointArrPtr);
 
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
 
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
-   
+
     filePtr = fopen(*inFileNamePtr, "r");
     while (fgets(line, LINE_LENGTH, filePtr))
     {
@@ -77,13 +79,11 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr)
             else
                 splittedLine = strtok(NULL, ",");
             cordinateVal = strtof(splittedLine, NULL);
-            /*  free(splittedLine); */
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
         numOfPointsIdx++;
         numOfCordsIdx = 0;
     }
-    printf("%f", (*pointArrPtr)[2][2]);
     fclose(filePtr);
 }
 
@@ -113,6 +113,16 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     fclose(*filePtr);
 }
 
-void computeCentroids(double **points, double **centroids)
+void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K)
 {
+    printf("%d", sizeof(*pointArrPtr)[0] / (sizeof(double *)));
+    /*
+    for (int pointIdx = 0; pointIdx < K; pointIdx++)
+    {
+        for (int cord = 0; cord <5;cord++)
+        {
+
+        }
+    }
+     */
 }
