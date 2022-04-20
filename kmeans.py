@@ -41,18 +41,8 @@ else:
   input_filename = sys.argv[2]
   output_filename = sys.argv[3]
 
-"""
-k=3
-max_iter = 600
-input_filename = "input_1.txt"
-output_filename = "output_11.txt"
-
-"""
 
 datapoints_arr = []
-centroids_arr = []
-
-cnt = 0
 
 try:
   input1 = open(input_filename)
@@ -69,20 +59,18 @@ while line1 != "":
 
   datapoints_arr.append(line)
 
-  if cnt < k:
-    centroids_arr.append(line)
-
-  cnt +=1
   line1 = input1.readline()
 
 input1.close()
+
+centroids_arr = datapoints_arr[:k]
 
 if len(datapoints_arr) < k:
   sys.exit("Invalid Input!")
 
 epsilon = 0.001
 Euclidean_norm = math.inf
-iter_cnt = 0
+iter_cnt = 1
 point_len = len(datapoints_arr[0])
 
 while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
@@ -112,7 +100,10 @@ while (iter_cnt != max_iter) or (float(Euclidean_norm) < epsilon):
 
   for i in range(k):
     old_centroid = centroids_arr[i]
-    new_centroid = [c_sum[i][j]/c_size[i] for j in range(point_len)]
+    try:
+      new_centroid = [c_sum[i][j]/c_size[i] for j in range(point_len)]
+    except ZeroDivisionError:
+      sys.exit("An Error Has Occurred")
     centroids_arr[i] = new_centroid
     distance = 0
 
