@@ -7,14 +7,16 @@
 #define PERCISION 10000
 
 void assignVars(int *, int *, char **, char **, char **, int);
-void assignPoints(double ***, char **);
+void assignPoints(double ***, char **, int *, int *);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
-void initializeCentroids(double ***, double ***, int);
+void initializeCentroids(double ***, double ***, int, int, int);
 
 int main(int argc, char *argv[])
 {
     int K;
     int max_iter;
+    int numOfPoints;
+    int numOfCords;
     double **pointsArr;
     double **centroids;
     char *inFileNamePtr;
@@ -22,10 +24,9 @@ int main(int argc, char *argv[])
 
     /* reminder:arr == &arr[0] :*/
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
-    assignPoints(&pointsArr, &inFileNamePtr);
-    initializeCentroids(&pointsArr, &centroids, K);
+    assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords);
+    initializeCentroids(&pointsArr, &centroids, K, numOfPoints, numOfCords);
 
-    printf("%f\n", pointsArr[0][1]);
 
     return 0;
 }
@@ -49,7 +50,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     }
 }
 
-void assignPoints(double ***pointArrPtr, char **inFileNamePtr)
+void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfCordsArg, int *numOfPointsArg)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
@@ -64,7 +65,8 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr)
     FILE *filePtr;
 
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
-
+    *numOfCordsArg = numOfCords;
+    *numOfPointsArg = numOfPoints;
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
 
     filePtr = fopen(*inFileNamePtr, "r");
@@ -113,9 +115,10 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     fclose(*filePtr);
 }
 
-void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K)
+void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, int numOfCords, int numOfPoints)
 {
-    printf("%d", sizeof(*pointArrPtr)[0] / (sizeof(double *)));
+    printf("%d", numOfCords);
+    printf("%d", numOfPoints);
     /*
     for (int pointIdx = 0; pointIdx < K; pointIdx++)
     {
@@ -125,4 +128,12 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K)
         }
     }
      */
+}
+void output(double ***centroidsPtr, int k)
+{
+   /*  for (int i = 0; i < k; i++)
+    {
+         for (int j; j < )
+         *centroidsPtr[i][0] = 
+    } */
 }
