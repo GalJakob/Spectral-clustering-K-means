@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <float.h>
 
 #define LINE_LENGTH 256
 #define DEFAULT_MAX_ITER 10000
@@ -53,7 +54,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     }
 }
 
-void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfCordsArg, int *numOfPointsArg)
+void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
@@ -133,9 +134,9 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, i
 void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr)
 {
     FILE *res;
-    char comma = ",";
-    res = fopen(*outFileNamePtr, "w");
+    char comma = ',';
     int i = 0;
+    res = fopen(*outFileNamePtr, "w");
     for (; i < k; i++)
     {
         int j = 0;
@@ -149,7 +150,6 @@ void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr
     }
     fclose(res);
 }
-
 void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K)
 {
     int iterCnt = 1;
@@ -168,6 +168,7 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
         for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
             clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
     }
+
     /* numOfPointsInCluster[1] = 2;
     printf("%p \n",numOfPointsInCluster);
     printf("%p",numOfPointsInCluster+1); */
@@ -176,26 +177,41 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
         for (pointIdx = 0; pointIdx < numOfPoints; pointIdx++)
         {
             double *point = (*pointsArrPtr)[pointIdx];
-            float minDistance = INFINITY;
+            double minDistance = DBL_MAX;
             int chosenClusterIdx = 0;
             int clusterIdx = 0;
+            int cordIdx = 0;
 
             for (clusterIdx = 0; clusterIdx < K; clusterIdx++)
             {
-                float tempDist = 0;
-                int cordIdx;
+                double tempDist = 0;
+
                 for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
                 {
-                    /* code */
+                    printf("%f \n", point[cordIdx]);
+                    printf("%f \n", (*centroidsArrPtr)[clusterIdx][cordIdx]);
+                    tempDist += pow(point[cordIdx] - ((*centroidsArrPtr)[clusterIdx][cordIdx]), 2);
                 }
-                /*
-                for l in range(point_len):
-        temp_dis += math.pow((float(point[l]) - float(centroids_arr[c][l])), 2)
 
+                if (tempDist < minDistance)
+                {
+                    chosenClusterIdx = clusterIdx;
+                    minDistance = tempDist;
+                }
             }
-              */
-            }
+            for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
+                clustersSumArrPtr[chosenClusterIdx][cordIdx] += point[cordIdx];
+            /*  printf("%d \n", chosenClusterIdx); */
+            /*  printf("%f \n", clustersSumArrPtr[chosenClusterIdx][cordIdx]); */
+            /* printf("%p", numOfPointsInCluster + 1); */
+
+            exit(0);
+
+            /*
+                for v in range(point_len):
+                  c_sum[cluster][v] += float(point[v]) */
         }
 
         /*  point_len = len(datapoints_arr[0]) */
     }
+}

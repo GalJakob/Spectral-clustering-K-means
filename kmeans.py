@@ -7,7 +7,7 @@ if n < 3:
 
 k = sys.argv[0]
 k_num = k.split(".")
-if len(K_num) > 2:
+if len(k_num) > 2:
   sys.exit("Invalid Input!")
 else:
   for digit in k_num:
@@ -20,8 +20,8 @@ else:
 
 if n == 3:
   max_iter = 200
-  input_filename = sys.argv[1]
-  output_filename = sys.argv[2]
+  input_filename = sys.argv[2]
+  output_filename = sys.argv[3]
 
 else:
   max_iter = sys.argv[1]
@@ -86,49 +86,52 @@ while (iter_cnt != max_iter) and (Euclidean_norm == False):
 
       for l in range(point_len):
         temp_dis += math.pow((float(point[l]) - float(centroids_arr[c][l])), 2)
-
+        print(point[l])
+        print(centroids_arr[c][l])
       if temp_dis < min_dis:
-        cluster = c
-        min_dis = temp_dis
+        cluster=c
+        min_dis=temp_dis
 
     for v in range(point_len):
       c_sum[cluster][v] += float(point[v])
 
     c_size[cluster] += 1
 
-  norm = []
+  norm=[]
 
   for i in range(k):
-    old_centroid = centroids_arr[i]
+    old_centroid=centroids_arr[i]
     try:
-      new_centroid = [c_sum[i][j]/c_size[i] for j in range(point_len)]
+      new_centroid=[c_sum[i][j]/c_size[i] for j in range(point_len)]
     except ZeroDivisionError:
       sys.exit("An Error Has Occurred")
-    centroids_arr[i] = new_centroid
-    distance = 0
+    centroids_arr[i]=new_centroid
+    distance=0
 
     for l in range(point_len):
-      distance += math.pow((float(old_centroid[l]) - float(new_centroid[l])), 2)
+      distance += math.pow((float(old_centroid[l]) -
+                           float(new_centroid[l])), 2)
 
     norm.append(distance)
 
-  norm = [math.sqrt(i) for i in norm]
-  Euclidean_norm = True
+  norm=[math.sqrt(i) for i in norm]
+  Euclidean_norm=True
 
   for i in range(k):
 
     if norm[i] > epsilon:
-      Euclidean_norm = False
+      Euclidean_norm=False
       continue
 
   iter_cnt += 1
 
-centroids_arr = [[str('%.4f' % (float(centroids_arr[i][j]))) for j in range(point_len)] for i in range(k)]
+centroids_arr=[[str('%.4f' % (float(centroids_arr[i][j])))
+                    for j in range(point_len)] for i in range(k)]
 
-res = open(output_filename, "w")
+res=open(output_filename, "w")
 
 for i in range(k):
-  final_line = centroids_arr[i][0]
+  final_line=centroids_arr[i][0]
   for j in range(1, point_len):
     final_line += "," + centroids_arr[i][j]
 
@@ -136,4 +139,3 @@ for i in range(k):
   res.write(final_line)
 
 res.close()
-
