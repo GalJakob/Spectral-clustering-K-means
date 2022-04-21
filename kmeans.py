@@ -61,7 +61,10 @@ while line1 != "":
 
   line1 = input1.readline()
 
-input1.close()
+try:
+  input1.close()
+except IOError:
+  sys.exit("An Error Has Occurred")
 
 centroids_arr = datapoints_arr[:k]
 
@@ -102,7 +105,7 @@ while (iter_cnt != max_iter) and (Euclidean_norm == False):
   for i in range(k):
     old_centroid=centroids_arr[i]
     try:
-      new_centroid=[c_sum[i][j]/c_size[i] for j in range(point_len)]
+      new_centroid = [str(c_sum[i][j]/c_size[i]) for j in range(point_len)]
     except ZeroDivisionError:
       sys.exit("An Error Has Occurred")
     centroids_arr[i]=new_centroid
@@ -128,7 +131,10 @@ while (iter_cnt != max_iter) and (Euclidean_norm == False):
 centroids_arr=[[str('%.4f' % (float(centroids_arr[i][j])))
                     for j in range(point_len)] for i in range(k)]
 
-res=open(output_filename, "w")
+try:
+  res = open(output_filename, "w")
+except IOError:
+  sys.exit("An Error Has Occurred")
 
 for i in range(k):
   final_line=centroids_arr[i][0]
@@ -138,4 +144,8 @@ for i in range(k):
   final_line += "\n"
   res.write(final_line)
 
-res.close()
+try:
+  res.close()
+except IOError:
+  sys.exit("An Error Has Occurred")
+
