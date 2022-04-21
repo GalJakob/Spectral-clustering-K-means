@@ -134,15 +134,21 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, i
 void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr)
 {
     FILE *res;
+    char comma = ",";
     res = fopen(*outFileNamePtr, "w");
     int i = 0;
     for (; i < k; i++)
      {
-        fprintf(res, "%.4f", *centroidsPtr[i][0]);
-        int j = 1;
+        int j = 0;
         for (; j < numOfCords - 1; j++){
+            fprintf(res, "%.4f", *centroidsPtr[i][j]);
+            fprintf(res, "%s", ",");
         }
+        fprintf(res, "%.4f", *centroidsPtr[i][j]);
+        fprintf(res, "\n");
+
      }
+    fclose(res);
 }
 
 void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr)
