@@ -11,7 +11,7 @@
 void assignVars(int *, int *, char **, char **, char **, int);
 void assignPoints(double ***, char **, int *, int *);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
-void initializeCentroids(double ***, double ***, int,int);
+void initializeCentroids(double ***, double ***, int, int);
 void mainAlgorithm(double ***, double ***, int, int, int, int);
 
 int main(int argc, char *argv[])
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     /* reminder:arr == &arr[0] :*/
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
     assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords);
-    initializeCentroids(&pointsArr, &centroids, K,numOfCords);
+    initializeCentroids(&pointsArr, &centroids, K, numOfCords);
     mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K);
 
     return 0;
@@ -132,16 +132,22 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, i
 }
 void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr)
 {
-    /*  FILE *res;
-     res = fopen(*outFileNamePtr, "w");
-     int i = 0;
-     for (; i < k; i++)
-      {
-         fprintf(res, "%.4f", *centroidsPtr[i][0]);
-         int j = 1;
-         for (; j < numOfCords - 1; j++){
-         }
-      } */
+    FILE *res;
+    char comma = ",";
+    res = fopen(*outFileNamePtr, "w");
+    int i = 0;
+    for (; i < k; i++)
+    {
+        int j = 0;
+        for (; j < numOfCords - 1; j++)
+        {
+            fprintf(res, "%.4f", *centroidsPtr[i][j]);
+            fprintf(res, "%s", ",");
+        }
+        fprintf(res, "%.4f", *centroidsPtr[i][j]);
+        fprintf(res, "\n");
+    }
+    fclose(res);
 }
 
 void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K)
@@ -155,13 +161,12 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
     double **clustersSumArrPtr;
     int *numOfPointsInCluster = (int *)malloc(K * sizeof(int));
 
-
     clustersSumArrPtr = (double **)malloc((sizeof(double *)) * K);
     for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
     {
         clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
         for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
-           clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
+            clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
     }
     /* numOfPointsInCluster[1] = 2;
     printf("%p \n",numOfPointsInCluster);
@@ -170,27 +175,27 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
     {
         for (pointIdx = 0; pointIdx < numOfPoints; pointIdx++)
         {
-            double* point = (*pointsArrPtr)[pointIdx];
+            double *point = (*pointsArrPtr)[pointIdx];
             float minDistance = INFINITY;
             int chosenClusterIdx = 0;
             int clusterIdx = 0;
 
             for (clusterIdx = 0; clusterIdx < K; clusterIdx++)
             {
-                float tempDist =0;
-                for (size_t i = 0; i < count; i++)
+                float tempDist = 0;
+                int cordIdx;
+                for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
                 {
                     /* code */
                 }
-                
+                /*
                 for l in range(point_len):
         temp_dis += math.pow((float(point[l]) - float(centroids_arr[c][l])), 2)
-                /* code */
+
             }
-            
-
+              */
+            }
         }
-    }
 
-    /*  point_len = len(datapoints_arr[0]) */
-}
+        /*  point_len = len(datapoints_arr[0]) */
+    }
