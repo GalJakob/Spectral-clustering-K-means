@@ -2,17 +2,15 @@ import sys
 import math
 
 n = len(sys.argv)
-if n < 3:
+if n < 4:
   sys.exit("Invalid Input")
 
-k = sys.argv[0]
-k_num = k.split(".")
-if len(K_num) > 2:
+k = sys.argv[1]
+try:
+  k = float(k)
+except ValueError:
   sys.exit("Invalid Input!")
-else:
-  for digit in k_num:
-    if not digit.isdigit():
-      sys.exit("Invalid Input!")
+
 if float(k) < 1 or float(k) != int(k):
   sys.exit("Invalid Input")
 else:
@@ -20,26 +18,23 @@ else:
 
 if n == 3:
   max_iter = 200
-  input_filename = sys.argv[1]
-  output_filename = sys.argv[2]
+  input_filename = sys.argv[2]
+  output_filename = sys.argv[3]
 
 else:
-  max_iter = sys.argv[1]
-  num = max_iter.split(".")
-  if len(num) > 2:
+  max_iter = sys.argv[2]
+  try:
+    max_iter = float(max_iter)
+  except ValueError:
     sys.exit("Invalid Input!")
-  else:
-    for digit in num:
-      if not digit.isdigit():
-        sys.exit("Invalid Input!")
 
   if float(max_iter) < 1 or float(max_iter) != int(max_iter):
     sys.exit("Invalid Input!")
   else:
     max_iter = int(max_iter)
 
-  input_filename = sys.argv[2]
-  output_filename = sys.argv[3]
+  input_filename = sys.argv[3]
+  output_filename = sys.argv[4]
 
 
 datapoints_arr = []
