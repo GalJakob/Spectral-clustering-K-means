@@ -155,25 +155,23 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
     int iterCnt = 1;
     int isAllEuclidiansUnderEps = 0; /*boolean*/
     int pointIdx = 0;
-    int pointIdxForInitCluster;
-    int cordForCluster;
-
-    double **clustersSumArrPtr;
-    int *numOfPointsInCluster = (int *)malloc(K * sizeof(int));
-
-    clustersSumArrPtr = (double **)malloc((sizeof(double *)) * K);
-    for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
-    {
-        clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
-        for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
-            clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
-    }
-
-    /* numOfPointsInCluster[1] = 2;
-    printf("%p \n",numOfPointsInCluster);
-    printf("%p",numOfPointsInCluster+1); */
     while ((iterCnt != max_iter) && (!isAllEuclidiansUnderEps))
     {
+        int pointIdxForInitCluster;
+        int cordForCluster;
+        double **clustersSumArrPtr;
+        int *numOfPointsInCluster = (int *)malloc(K * sizeof(int));
+        double *normDistances = (double *)malloc(K * sizeof(double));
+        int idxForNormCalcs = 0;
+
+        clustersSumArrPtr = (double **)malloc((sizeof(double *)) * K);
+        for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
+        {
+            clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
+            for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
+                clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
+        }
+
         for (pointIdx = 0; pointIdx < numOfPoints; pointIdx++)
         {
             double *point = (*pointsArrPtr)[pointIdx];
@@ -188,8 +186,6 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
                 for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
                 {
-                    printf("%f \n", point[cordIdx]);
-                    printf("%f \n", (*centroidsArrPtr)[clusterIdx][cordIdx]);
                     tempDist += pow(point[cordIdx] - ((*centroidsArrPtr)[clusterIdx][cordIdx]), 2);
                 }
 
@@ -201,17 +197,52 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
             }
             for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
                 clustersSumArrPtr[chosenClusterIdx][cordIdx] += point[cordIdx];
-            /*  printf("%d \n", chosenClusterIdx); */
-            /*  printf("%f \n", clustersSumArrPtr[chosenClusterIdx][cordIdx]); */
-            /* printf("%p", numOfPointsInCluster + 1); */
 
-            exit(0);
-
-            /*
-                for v in range(point_len):
-                  c_sum[cluster][v] += float(point[v]) */
+            numOfPointsInCluster[chosenClusterIdx] = numOfPointsInCluster[chosenClusterIdx] + 1;
+            if (iterCnt == 2)
+                printf("a %d\n", numOfPointsInCluster[1]);
         }
 
-        /*  point_len = len(datapoints_arr[0]) */
+        for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
+        {
+            double *prevCentroid = (*centroidsArrPtr)[idxForNormCalcs];
+            int cordIdxForNorm = 0;
+            double distance = 0;
+
+            /* TODO:add exception */
+            double *newCentroid = (double *)malloc(numOfCords * sizeof(double));
+            for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
+            {
+                if (numOfPointsInCluster[cordIdxForNorm] == 0)
+                {
+                    printf("%d", iterCnt);
+                    /*  exit("zero devision");  */
+                    exit(0);
+                }
+                newCentroid[cordIdxForNorm] = clustersSumArrPtr[idxForNormCalcs][cordIdxForNorm] / numOfPointsInCluster[cordIdxForNorm];
+            }
+            (*centroidsArrPtr)[idxForNormCalcs] = newCentroid;
+
+            for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
+            {
+                distance += pow(prevCentroid[cordIdxForNorm] - newCentroid[cordIdxForNorm], 2);
+            }
+            normDistances[idxForNormCalcs] = pow(distance, 0.5);
+        }
+
+        isAllEuclidiansUnderEps = 1;
+        for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
+        {
+            if (normDistances[idxForNormCalcs] > EPSILON)
+            {
+                isAllEuclidiansUnderEps = 0;
+                break;
+            }
+        }
+        iterCnt++;
+        printf("%d\n ", iterCnt);
     }
+    printf("%f \n", (*centroidsArrPtr)[2][0]);
+    printf("%f \n", (*centroidsArrPtr)[2][1]);
+    printf("%f \n", (*centroidsArrPtr)[2][2]);
 }
