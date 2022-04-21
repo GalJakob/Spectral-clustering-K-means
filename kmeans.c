@@ -173,6 +173,7 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
         }
 
         for (pointIdx = 0; pointIdx < numOfPoints; pointIdx++)
+
         {
             double *point = (*pointsArrPtr)[pointIdx];
             double minDistance = DBL_MAX;
@@ -199,8 +200,8 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 clustersSumArrPtr[chosenClusterIdx][cordIdx] += point[cordIdx];
 
             numOfPointsInCluster[chosenClusterIdx] = numOfPointsInCluster[chosenClusterIdx] + 1;
-            if (iterCnt == 2)
-                printf("a %d\n", numOfPointsInCluster[1]);
+            /*   if (iterCnt == 2)
+                  printf("a %d\n", numOfPointsInCluster[2]); */
         }
 
         for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
@@ -215,11 +216,11 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
             {
                 if (numOfPointsInCluster[cordIdxForNorm] == 0)
                 {
-                    printf("%d", iterCnt);
+                    printf("aa %d", iterCnt);
                     /*  exit("zero devision");  */
                     exit(0);
                 }
-                newCentroid[cordIdxForNorm] = clustersSumArrPtr[idxForNormCalcs][cordIdxForNorm] / numOfPointsInCluster[cordIdxForNorm];
+                newCentroid[cordIdxForNorm] = clustersSumArrPtr[idxForNormCalcs][cordIdxForNorm] / numOfPointsInCluster[idxForNormCalcs];
             }
             (*centroidsArrPtr)[idxForNormCalcs] = newCentroid;
 
@@ -239,10 +240,10 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 break;
             }
         }
+        
         iterCnt++;
-        printf("%d\n ", iterCnt);
     }
-    printf("%f \n", (*centroidsArrPtr)[2][0]);
-    printf("%f \n", (*centroidsArrPtr)[2][1]);
-    printf("%f \n", (*centroidsArrPtr)[2][2]);
+    printf("%f \n", (*centroidsArrPtr)[0][0]);
+    printf("%f \n", (*centroidsArrPtr)[0][1]);
+    printf("%f \n", (*centroidsArrPtr)[0][2]);
 }
