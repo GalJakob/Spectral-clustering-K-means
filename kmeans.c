@@ -5,19 +5,20 @@
 #include <float.h>
 
 #define LINE_LENGTH 256
-#define DEFAULT_MAX_ITER 10000
+#define DEFAULT_MAX_ITER 200
 #define EPSILON 0.001
-#define PERCISION 10000
 
-void assignVars(int *, int *, char **, char **, char **, int);
-void assignPoints(double ***, char **, int *, int *);
-void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***);
-void initializeCentroids(double ***, double ***, int, int);
-void mainAlgorithm(double ***, double ***, int, int, int, int);
+void assignVars(int *, int *, char **, char **, char **, int, int *);
+void assignPoints(double ***, char **, int *, int *, int *);
+void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***, int **);
+void initializeCentroids(double ***, double ***, int, int, int *);
+void mainAlgorithm(double ***, double ***, int, int, int, int, int *);
+void output(double ***, int, int, char **, int *);
 
 int main(int argc, char *argv[])
 {
     int K;
+    int shouldTerminate = 0; /* boolean */
     int max_iter = DEFAULT_MAX_ITER;
     int numOfPoints;
     int numOfCords;
@@ -26,18 +27,19 @@ int main(int argc, char *argv[])
     char *inFileNamePtr;
     char *outFileNamePtr;
 
-    /* reminder:arr == &arr[0] :*/
-    assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc);
-    assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords);
-    initializeCentroids(&pointsArr, &centroids, K, numOfCords);
-    mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K);
-
-    return 0;
+    
+    assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc, &shouldTerminate);
+    assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords, &shouldTerminate);
+    initializeCentroids(&pointsArr, &centroids, K, numOfCords, &shouldTerminate);
+    mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K, &shouldTerminate);
+    output(&centroids, K, numOfCords, &outFileNamePtr, &shouldTerminate);
+    
+    return shouldTerminate;
 }
 
 /* functions :*/
 
-void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFileNamePtr, char **args, int numOfArgs)
+void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFileNamePtr, char **args, int numOfArgs, int *shouldTerminate)
 {
     if (numOfArgs == 5)
     {
@@ -45,16 +47,29 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
         *max_iterPtr = atoi(args[2]);
         *inFileNamePtr = args[3];
         *outFileNamePtr = args[4];
+
+        if (*kPtr == 0 || *max_iterPtr == 0)
+        {
+            *shouldTerminate = 1;
+            printf("%s", "invalid input!");
+            return;
+        }
     }
-    else
+    else if (numOfArgs == 4)
     {
         *kPtr = atoi(args[1]);
         *inFileNamePtr = args[2];
         *outFileNamePtr = args[3];
     }
+    else
+    {
+        *shouldTerminate = 1;
+        printf("%s", "invalid input!");
+        return;
+    }
 }
 
-void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg)
+void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg, int *shouldTerminate)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
@@ -66,12 +81,14 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     int numOfPointsIdx = 0;
 
     FILE *filePtr;
-
-    computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
+    if (*shouldTerminate)
+        return;
+    computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr, &shouldTerminate);
     *numOfCordsArg = numOfCords;
     *numOfPointsArg = numOfPoints;
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
-
+    if (*shouldTerminate)
+        return;
     filePtr = fopen(*inFileNamePtr, "r");
     while (fgets(line, LINE_LENGTH, filePtr))
     {
@@ -92,11 +109,18 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     fclose(filePtr);
 }
 
-void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoints, char ***inFileNamePtr)
+void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoints, char ***inFileNamePtr, int **shouldTerminate)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
     *filePtr = fopen(**inFileNamePtr, "r");
+    if (*filePtr == NULL)
+    {
+        **shouldTerminate = 1;
+        printf("%s", "An Error Has Occurred");
+        return;
+    }
+
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;
@@ -115,14 +139,21 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
             *numOfCords = *numOfCords - 1;
         }
     }
-    fclose(*filePtr);
+    if (fclose(*filePtr) != 0)
+    {
+        **shouldTerminate = 1;
+        printf("%s", "An Error Has Occurred");
+        return;
+    }
 }
 
-void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, int numOfCords)
+void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, int numOfCords, int *shouldTerminate)
 {
-    int pointIdx;
-    int cord;
 
+    int pointIdx = 0;
+    int cord = 0;
+    if (*shouldTerminate)
+        return;
     *centroidsPtr = (double **)malloc((sizeof(double *)) * K);
     for (pointIdx = 0; pointIdx < K; pointIdx++)
     {
@@ -131,30 +162,35 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, i
             (*centroidsPtr)[pointIdx][cord] = (*pointArrPtr)[pointIdx][cord];
     }
 }
-void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr)
+void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr, int *shouldTerminate)
 {
     FILE *res;
-    char comma = ',';
     int i = 0;
+    if (*shouldTerminate)
+        return;
     res = fopen(*outFileNamePtr, "w");
+
     for (; i < k; i++)
     {
         int j = 0;
         for (; j < numOfCords - 1; j++)
         {
-            fprintf(res, "%.4f", *centroidsPtr[i][j]);
+            fprintf(res, "%.4f", (*centroidsPtr)[i][j]);
             fprintf(res, "%s", ",");
         }
-        fprintf(res, "%.4f", *centroidsPtr[i][j]);
+        fprintf(res, "%.4f", (*centroidsPtr)[i][j]);
         fprintf(res, "\n");
     }
     fclose(res);
 }
-void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K)
+void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K, int *shouldTerminate)
 {
+
     int iterCnt = 1;
     int isAllEuclidiansUnderEps = 0; /*boolean*/
     int pointIdx = 0;
+    if (*shouldTerminate)
+        return;
     while ((iterCnt != max_iter) && (!isAllEuclidiansUnderEps))
     {
         int pointIdxForInitCluster;
@@ -163,17 +199,31 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
         int *numOfPointsInCluster = (int *)malloc(K * sizeof(int));
         double *normDistances = (double *)malloc(K * sizeof(double));
         int idxForNormCalcs = 0;
-
         clustersSumArrPtr = (double **)malloc((sizeof(double *)) * K);
+
+        if (numOfPointsInCluster == NULL || normDistances == NULL || clustersSumArrPtr == NULL)
+        {
+            *shouldTerminate = 1;
+            printf("%s", "An Error Has Occurred");
+            return;
+        }
         for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
         {
             clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
+            if (clustersSumArrPtr[pointIdxForInitCluster] == NULL)
+            {
+                *shouldTerminate = 1;
+                printf("%s", "An Error Has Occurred");
+                return;
+            }
+
             for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
                 clustersSumArrPtr[pointIdxForInitCluster][cordForCluster] = 0;
+            numOfPointsInCluster[pointIdxForInitCluster] = 0;
+            normDistances[pointIdxForInitCluster] = 0;
         }
 
         for (pointIdx = 0; pointIdx < numOfPoints; pointIdx++)
-
         {
             double *point = (*pointsArrPtr)[pointIdx];
             double minDistance = DBL_MAX;
@@ -186,9 +236,7 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 double tempDist = 0;
 
                 for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
-                {
                     tempDist += pow(point[cordIdx] - ((*centroidsArrPtr)[clusterIdx][cordIdx]), 2);
-                }
 
                 if (tempDist < minDistance)
                 {
@@ -200,48 +248,45 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 clustersSumArrPtr[chosenClusterIdx][cordIdx] += point[cordIdx];
 
             numOfPointsInCluster[chosenClusterIdx] = numOfPointsInCluster[chosenClusterIdx] + 1;
-            /*   if (iterCnt == 2)
-                  printf("a %d\n", numOfPointsInCluster[2]); */
         }
 
         for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
         {
             int idxForCent = 0;
-            double *prevCentroid = (double *)malloc(numOfCords * sizeof(double));
-
             int cordIdxForNorm = 0;
             double distance = 0;
-
-            /* TODO:add exception */
+            double *prevCentroid = (double *)malloc(numOfCords * sizeof(double));
             double *newCentroid = (double *)malloc(numOfCords * sizeof(double));
 
-            /* make centroid loop */
-            for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
+            if (newCentroid == NULL || prevCentroid == NULL)
             {
+                *shouldTerminate = 1;
+                printf("%s", "An Error Has Occurred");
+                return;
+            }
+
+            for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
                 prevCentroid[idxForCent] = (*centroidsArrPtr)[idxForNormCalcs][idxForCent];
-            }
-            for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
+            if (!(numOfPointsInCluster[idxForNormCalcs])) /* prevents devision by 0 */
             {
-                if (numOfPointsInCluster[cordIdxForNorm] == 0)
-                {
-                   /*  printf("aa %d", iterCnt); */
-                    /*  exit("zero devision");  */
-                    exit(0);
-                }
+                *shouldTerminate = 1;
+                printf("%s", "An Error Has Occurred");
+                return;
+            }
+
+            for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
                 newCentroid[cordIdxForNorm] = clustersSumArrPtr[idxForNormCalcs][cordIdxForNorm] / numOfPointsInCluster[idxForNormCalcs];
-            }
+
             for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
-            {
-               (*centroidsArrPtr)[idxForNormCalcs][idxForCent] = newCentroid[idxForCent];
-            }
-            
-           /*  (*centroidsArrPtr)[idxForNormCalcs] = newCentroid;
- */
+                (*centroidsArrPtr)[idxForNormCalcs][idxForCent] = newCentroid[idxForCent];
+
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
-            {
                 distance += pow(prevCentroid[cordIdxForNorm] - newCentroid[cordIdxForNorm], 2);
-            }
+
             normDistances[idxForNormCalcs] = pow(distance, 0.5);
+
+            free(prevCentroid);
+            free(newCentroid);
         }
 
         isAllEuclidiansUnderEps = 1;
@@ -253,12 +298,13 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 break;
             }
         }
+
+        for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
+            free(clustersSumArrPtr[idxForNormCalcs]);
+        free(clustersSumArrPtr);
         free(numOfPointsInCluster);
         free(normDistances);
-          /*   printf("aa %d \n", iterCnt); */
+
         iterCnt++;
     }
-    printf("%f \n", (*centroidsArrPtr)[0][0]);
-    printf("%f \n", (*centroidsArrPtr)[0][1]);
-    printf("%f \n", (*centroidsArrPtr)[0][2]);
 }
