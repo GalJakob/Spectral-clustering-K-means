@@ -206,24 +206,37 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
         for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
         {
-            double *prevCentroid = (*centroidsArrPtr)[idxForNormCalcs];
+            int idxForCent = 0;
+            double *prevCentroid = (double *)malloc(numOfCords * sizeof(double));
+
             int cordIdxForNorm = 0;
             double distance = 0;
 
             /* TODO:add exception */
             double *newCentroid = (double *)malloc(numOfCords * sizeof(double));
+
+            /* make centroid loop */
+            for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
+            {
+                prevCentroid[idxForCent] = (*centroidsArrPtr)[idxForNormCalcs][idxForCent];
+            }
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
             {
                 if (numOfPointsInCluster[cordIdxForNorm] == 0)
                 {
-                    printf("aa %d", iterCnt);
+                   /*  printf("aa %d", iterCnt); */
                     /*  exit("zero devision");  */
                     exit(0);
                 }
                 newCentroid[cordIdxForNorm] = clustersSumArrPtr[idxForNormCalcs][cordIdxForNorm] / numOfPointsInCluster[idxForNormCalcs];
             }
-            (*centroidsArrPtr)[idxForNormCalcs] = newCentroid;
-
+            for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
+            {
+               (*centroidsArrPtr)[idxForNormCalcs][idxForCent] = newCentroid[idxForCent];
+            }
+            
+           /*  (*centroidsArrPtr)[idxForNormCalcs] = newCentroid;
+ */
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
             {
                 distance += pow(prevCentroid[cordIdxForNorm] - newCentroid[cordIdxForNorm], 2);
@@ -240,7 +253,9 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
                 break;
             }
         }
-        
+        free(numOfPointsInCluster);
+        free(normDistances);
+          /*   printf("aa %d \n", iterCnt); */
         iterCnt++;
     }
     printf("%f \n", (*centroidsArrPtr)[0][0]);
