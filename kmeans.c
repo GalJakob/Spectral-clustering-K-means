@@ -51,7 +51,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
         if (*kPtr == 0 || *max_iterPtr == 0)
         {
             *shouldTerminate = 1;
-            printf("%s", "invalid input!");
+            printf("%s", "Invalid input!");
             return;
         }
     }
@@ -64,7 +64,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     else
     {
         *shouldTerminate = 1;
-        printf("%s", "invalid input!");
+        printf("%s", "Invalid input!");
         return;
     }
 }
