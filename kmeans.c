@@ -100,7 +100,7 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
                 splittedLine = strtok(line, ",");
             else
                 splittedLine = strtok(NULL, ",");
-            cordinateVal = strtof(splittedLine, NULL);
+            cordinateVal = atof(splittedLine);
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
         numOfPointsIdx++;
