@@ -2,24 +2,26 @@ import sys
 import math
 
 n = len(sys.argv)
+if n < 4:
+  sys.exit("Invalid Input")
 
 k = sys.argv[1]
 try:
   k = float(k)
 except ValueError:
-  sys.exit("Invalid Input")
+  sys.exit("Invalid Input!")
 
 if float(k) < 1 or float(k) != int(k):
   sys.exit("Invalid Input")
 else:
   k = int(k)
 
-if n == 4:
+if n == 3:
   max_iter = 200
   input_filename = sys.argv[2]
   output_filename = sys.argv[3]
 
-elif n == 5:
+else:
   max_iter = sys.argv[2]
   try:
     max_iter = float(max_iter)
@@ -28,14 +30,12 @@ elif n == 5:
 
   if float(max_iter) < 1 or float(max_iter) != int(max_iter):
     sys.exit("Invalid Input!")
+    input_filename = sys.argv[3]
+    output_filename = sys.argv[4]
   else:
     max_iter = int(max_iter)
 
-else:
-  sys.exit("Invalid Input")
-
-  input_filename = sys.argv[3]
-  output_filename = sys.argv[4]
+  
 
 
 datapoints_arr = []
