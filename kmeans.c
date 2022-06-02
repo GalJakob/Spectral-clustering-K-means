@@ -94,7 +94,7 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
     if (*shouldTerminate || pointArrPtr == NULL)
     {
-        printf("%s", "An Error Has Occurred");
+        printf("%s", "An Error Has Occurred ");
         *shouldTerminate = 1;
         return;
     }

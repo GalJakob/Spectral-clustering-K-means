@@ -1,7 +1,6 @@
 import sys
 import math
-import numpy as np
-np.random.choice('g')
+
 
 n = len(sys.argv)
 
