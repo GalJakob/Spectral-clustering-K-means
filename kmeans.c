@@ -3,13 +3,15 @@
 #include <string.h>
 #include <math.h>
 #include <float.h>
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 
 #define LINE_LENGTH 256
 #define DEFAULT_MAX_ITER 200
 #define EPSILON 0.001
 
 void assignVars(int *, int *, char **, char **, char **, int, int *);
-void assignPoints(double ***, char **, int *, int *, int *);
+void assignPoints(double ***, char **, int *, int *, int *, int);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***, int **);
 void initializeCentroids(double ***, double ***, int, int, int *);
 void mainAlgorithm(double ***, double ***, int, int, int, int, int *);
@@ -27,13 +29,12 @@ int main(int argc, char *argv[])
     char *inFileNamePtr;
     char *outFileNamePtr;
 
-    
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc, &shouldTerminate);
-    assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords, &shouldTerminate);
+    assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords, &shouldTerminate, K);
     initializeCentroids(&pointsArr, &centroids, K, numOfCords, &shouldTerminate);
     mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K, &shouldTerminate);
     output(&centroids, K, numOfCords, &outFileNamePtr, &shouldTerminate);
-    
+
     return shouldTerminate;
 }
 
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
 
 void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFileNamePtr, char **args, int numOfArgs, int *shouldTerminate)
 {
+
     if (numOfArgs == 5)
     {
         *kPtr = atoi(args[1]);
@@ -69,7 +71,7 @@ void assignVars(int *kPtr, int *max_iterPtr, char **inFileNamePtr, char **outFil
     }
 }
 
-void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg, int *shouldTerminate)
+void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg, int *shouldTerminate, int K)
 {
     char line[LINE_LENGTH];
     char *splittedLine;
@@ -86,9 +88,16 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr, &shouldTerminate);
     *numOfCordsArg = numOfCords;
     *numOfPointsArg = numOfPoints;
+    if (K >= numOfPoints)
+        printf("%s", "Invalid input!");
+
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
-    if (*shouldTerminate)
+    if (*shouldTerminate || pointArrPtr == NULL)
+    {
+        printf("%s", "An Error Has Occurred");
+        *shouldTerminate = 1;
         return;
+    }
     filePtr = fopen(*inFileNamePtr, "r");
     while (fgets(line, LINE_LENGTH, filePtr))
     {
@@ -145,6 +154,7 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
         printf("%s", "An Error Has Occurred");
         return;
     }
+    free(splittedLine);
 }
 
 void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, int numOfCords, int *shouldTerminate)
@@ -155,6 +165,12 @@ void initializeCentroids(double ***pointArrPtr, double ***centroidsPtr, int K, i
     if (*shouldTerminate)
         return;
     *centroidsPtr = (double **)malloc((sizeof(double *)) * K);
+    if (centroidsPtr == NULL)
+    {
+        *shouldTerminate = 1;
+        printf("%s", "An Error Has Occurred");
+        return;
+    }
     for (pointIdx = 0; pointIdx < K; pointIdx++)
     {
         (*centroidsPtr)[pointIdx] = (double *)malloc(numOfCords * sizeof(double));
@@ -307,4 +323,35 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
         iterCnt++;
     }
+}
+
+// python:
+static PyObject *funcFromPy(PyObject *self, PyObject *args)
+{
+    const char *command;
+    int sts;
+
+    if (!PyArg_ParseTuple(args, "s", &command)) // if there is no arguments
+        return NULL;
+    // sts = mainAlgorithm(command);
+    return PyLong_FromLong(sts);
+}
+static PyMethodDef mymethods[] =
+    {
+        {"kmeans", funcFromPy},
+        {NULL}};
+
+static struct PyModuleDef kmeansMod =
+    {
+        PyModuleDef_HEAD_INIT,
+        "kmeans", /* name of module */
+        "",       /* module documentation, may be NULL */
+        -1,       /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+        mymethods};
+
+PyMODINIT_FUNC
+initkmeans(void)
+{
+    return PyModule_Create(&kmeansMod);
+    import_array();
 }
