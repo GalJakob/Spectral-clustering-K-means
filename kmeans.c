@@ -14,13 +14,15 @@ void assignVars(int *, int *, char **, char **, char **, int, int *);
 void assignPoints(double ***, char **, int *, int *, int *, int);
 void computeNumOfCordsAndPoints(FILE **, int *, int *, char ***, int **);
 void initializeCentroids(double ***, double ***, int, int, int *);
-void mainAlgorithm(double ***, double ***, int, int, int, int, int *);
+PyObject *mainAlgorithm2(double ***, double ***, int, int, int, int);
 void output(double ***, int, int, char **, int *);
+double **convertPyObjToDP(PyObject *, int, int);
+PyObject *convertDPToPyObj(double ***, int, int);
 
-int main(int argc, char *argv[])
+/* int main(int argc, char *argv[])
 {
     int K;
-    int shouldTerminate = 0; /* boolean */
+    int shouldTerminate = 0;
     int max_iter = DEFAULT_MAX_ITER;
     int numOfPoints;
     int numOfCords;
@@ -32,11 +34,12 @@ int main(int argc, char *argv[])
     assignVars(&K, &max_iter, &inFileNamePtr, &outFileNamePtr, argv, argc, &shouldTerminate);
     assignPoints(&pointsArr, &inFileNamePtr, &numOfPoints, &numOfCords, &shouldTerminate, K);
     initializeCentroids(&pointsArr, &centroids, K, numOfCords, &shouldTerminate);
-    mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K, &shouldTerminate);
+    mainAlgorithm(&pointsArr, &centroids, max_iter, numOfPoints, numOfCords, K);
     output(&centroids, K, numOfCords, &outFileNamePtr, &shouldTerminate);
 
     return shouldTerminate;
 }
+*/
 
 /* functions :*/
 
@@ -199,14 +202,13 @@ void output(double ***centroidsPtr, int k, int numOfCords, char **outFileNamePtr
     }
     fclose(res);
 }
-void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K, int *shouldTerminate)
+
+PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K)
 {
 
     int iterCnt = 1;
     int isAllEuclidiansUnderEps = 0; /*boolean*/
     int pointIdx = 0;
-    if (*shouldTerminate)
-        return;
     while ((iterCnt != max_iter) && (!isAllEuclidiansUnderEps))
     {
         int pointIdxForInitCluster;
@@ -219,18 +221,14 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
         if (numOfPointsInCluster == NULL || normDistances == NULL || clustersSumArrPtr == NULL)
         {
-            *shouldTerminate = 1;
             printf("%s", "An Error Has Occurred");
-            return;
         }
         for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
         {
             clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
             if (clustersSumArrPtr[pointIdxForInitCluster] == NULL)
             {
-                *shouldTerminate = 1;
                 printf("%s", "An Error Has Occurred");
-                return;
             }
 
             for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
@@ -276,18 +274,14 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
             if (newCentroid == NULL || prevCentroid == NULL)
             {
-                *shouldTerminate = 1;
                 printf("%s", "An Error Has Occurred");
-                return;
             }
 
             for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
                 prevCentroid[idxForCent] = (*centroidsArrPtr)[idxForNormCalcs][idxForCent];
             if (!(numOfPointsInCluster[idxForNormCalcs])) /* prevents devision by 0 */
             {
-                *shouldTerminate = 1;
                 printf("%s", "An Error Has Occurred");
-                return;
             }
 
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
@@ -323,19 +317,31 @@ void mainAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int max_it
 
         iterCnt++;
     }
+    return convertDPToPyObj(&*centroidsArrPtr, K, numOfCords);
 }
 
-// python:
+/* python */
 static PyObject *funcFromPy(PyObject *self, PyObject *args)
 {
-    const char *command;
-    int sts;
+    PyObject *pyPointsArrPtr;
+    PyObject *pyCentroidsArrPtr;
+    PyObject *returnedCentroids;
 
-    if (!PyArg_ParseTuple(args, "s", &command)) // if there is no arguments
+    double **pointsArr;
+    double **centroidsArr;
+    int max_iter;
+    int K;
+    int numOfPoints;
+    int numOfCords;
+
+    if (!PyArg_ParseTuple(args, "OOiiii", &pyPointsArrPtr, &pyCentroidsArrPtr, &K, &max_iter, &numOfPoints, &numOfCords))
         return NULL;
-    // sts = mainAlgorithm(command);
-    return PyLong_FromLong(sts);
+    pointsArr = convertPyObjToDP(pyPointsArrPtr, numOfPoints, numOfCords);
+    centroidsArr = convertPyObjToDP(pyCentroidsArrPtr, K, numOfCords);
+    returnedCentroids = Py_BuildValue("O", mainAlgorithm2(&pointsArr, &centroidsArr, max_iter, numOfPoints, numOfCords, K));
+    return returnedCentroids;
 }
+
 static PyMethodDef mymethods[] =
     {
         {"kmeans", funcFromPy},
@@ -344,14 +350,67 @@ static PyMethodDef mymethods[] =
 static struct PyModuleDef kmeansMod =
     {
         PyModuleDef_HEAD_INIT,
-        "kmeans", /* name of module */
-        "",       /* module documentation, may be NULL */
-        -1,       /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+        "kmeans",
+        "",
+        -1,
         mymethods};
 
-PyMODINIT_FUNC
-initkmeans(void)
+PyMODINIT_FUNC initkmeans(void)
 {
     return PyModule_Create(&kmeansMod);
-    import_array();
+}
+double **convertPyObjToDP(PyObject *pyPointsArrPtr, int numOfPoints, int numOfCords)
+{
+    double **pointsArr;
+  
+    PyObject *point;
+
+    int numOfCordsIdx = 0;
+    int numOfPointsIdx = 0;
+
+    pointsArr = (double **)malloc((sizeof(double *)) * numOfPoints);
+    if (pointsArr == NULL)
+    {
+        printf("%s", "An Error Has Occurred ");
+      
+    }
+
+    for (numOfPointsIdx = 0; numOfPointsIdx < numOfPoints; numOfPointsIdx++)
+    {
+        (pointsArr)[numOfPointsIdx] = (double *)malloc(numOfCords * sizeof(double));
+        if ((pointsArr)[numOfPointsIdx] == NULL)
+        {
+            printf("%s", "An Error Has Occurred ");
+            
+        }
+        point = PyList_GetItem(pyPointsArrPtr, numOfCordsIdx);
+        for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
+        {
+            pointsArr[numOfCordsIdx][numOfCordsIdx] = PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx));
+        }
+    }
+
+    return pointsArr;
+}
+
+PyObject *convertDPToPyObj(double ***centroidsArrPtr, int K, int numOfCords)
+{
+    PyObject *pythonCent;
+    PyObject *pythonCord;
+    PyObject *pythonCentroids;
+    int cordIdx;
+    int centIdx;
+
+    pythonCentroids = PyList_New(K);
+    for (centIdx = 0; centIdx < K; centIdx++)
+    {
+        pythonCent = PyList_New(numOfCords);
+        for (cordIdx = 0; cordIdx < numOfCords; cordIdx++)
+        {
+            pythonCord = Py_BuildValue("d", (*centroidsArrPtr)[centIdx][cordIdx]);
+            PyList_SetItem(pythonCent, cordIdx, pythonCord);
+        }
+        PyList_SetItem(pythonCentroids, centIdx, pythonCent);
+    }
+    return pythonCentroids;
 }
