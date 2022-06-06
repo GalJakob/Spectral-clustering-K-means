@@ -72,6 +72,7 @@ Euclidean_norm = False
 iter_cnt = 1
 point_len = len(datapoints_arr[0])
 
+
 while (iter_cnt != max_iter) and (Euclidean_norm == False):
   c_size = [0 for i in range(k)]
   c_sum = [[0 for o in range(point_len)] for j in range(k)]
