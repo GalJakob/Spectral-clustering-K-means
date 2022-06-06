@@ -10,7 +10,7 @@
 #define DEFAULT_MAX_ITER 200
 #define EPSILON 0.001
 
-static PyObject *funcFromPy(PyObject *self, PyObject *args);
+static PyObject *fit(PyObject *self, PyObject *args);
 PyObject *mainAlgorithm2(double ***, double ***, int, int, int, int);
 PyObject *convertDPToPyObj(double ***, int, int);
 double **convertPyObjToDP(PyObject *, int, int);
@@ -133,7 +133,7 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
 }
 
 /* python */
-static PyObject *funcFromPy(PyObject *self, PyObject *args)
+static PyObject *fit(PyObject *self, PyObject *args)
 {
     PyObject *pyPointsArrPtr;
     PyObject *pyCentroidsArrPtr;
@@ -155,18 +155,21 @@ static PyObject *funcFromPy(PyObject *self, PyObject *args)
     return returnedCentroids;
 }
 
-static PyMethodDef mymethods[] =
-    {
-        {"kmeans", funcFromPy},
-        {NULL}};
+static PyMethodDef myMethods[] = {
+        {"fit",
+                (PyCFunction) fit,
+                      METH_VARARGS,
+                         PyDoc_STR("kmeans implement")},
+        {NULL,  NULL, 0, NULL}
+};
 
 static struct PyModuleDef kmeansMod =
     {
         PyModuleDef_HEAD_INIT,
-        "kmeans",
+        "kmeans_PP",
         "",
         -1,
-        mymethods};
+        myMethods};
 
 PyMODINIT_FUNC initkmeans(void)
 {
