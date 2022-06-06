@@ -6,7 +6,7 @@ import csv
 import sys
 
 n = len(sys.argv)
-
+i = 1
 k = sys.argv[1]
 try:
     k = float(k)
