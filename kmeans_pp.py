@@ -1,13 +1,15 @@
-
-import math
 import numpy as np
 import pandas as pd
-import csv
 import sys
+import math
+import mykmeanssp as km
 
-n = len(sys.argv)
-i = 1
+
+#checking for invalid inputs
+num_args = len(sys.argv)
+
 k = sys.argv[1]
+
 try:
     k = float(k)
 except ValueError:
@@ -18,13 +20,13 @@ if float(k) < 1 or float(k) != int(k):
 else:
     k = int(k)
 
-if n == 5:
+if num_args == 5:
     max_iter = 300
     eps = sys.argv[2]
     input_filename1 = sys.argv[3]
     input_filename2 = sys.argv[4]
 
-elif n == 6:
+elif num_args == 6:
     max_iter = sys.argv[2]
     try:
         max_iter = float(max_iter)
@@ -43,61 +45,66 @@ else:
     sys.exit("Invalid Input")
 
 
-try:
-    input1 = pd.read_csv(input_filename1, sep = ",", header= None).set_index(0)
-    input2 = pd.read_csv(input_filename1, sep = ",", header= None).set_index(0)
-    input = pd.merge(input1, input2, left_index= True, right_index=True).sort_values(0)
-except IOError:
-    sys.exit("An Error Has Occurred")
+input_filename1 = "input_1_db_1.txt"
+input_filename2 = "input_1_db_2.txt"
+k = 3
 
-line1 = input1.readline()
+#seed
+np.random.seed(0)
 
-while line1 != "":
-    line = line1.split(",")
-    line[len(line) - 1] = line[len(line) - 1].replace("\n", "")
+#creating needed input from given arguments
+input1 = pd.read_csv(input_filename1, sep=",", header=None)
+input2 = pd.read_csv(input_filename2, sep=",", header=None)
+input_temp = pd.merge(input1, input2, on =0)
+input = input_temp.sort_values(0)
 
-    datapoints_arr.append(line)
 
-    line1 = input1.readline()
+indices = input.iloc[:,0]
+indices_np = indices.to_numpy()
 
-try:
-    input1.close()
-except IOError:
-    sys.exit("An Error Has Occurred")
+datapoints = input.drop(columns=[0])
+datapoints_np = datapoints.to_numpy()
 
-centroids_arr = datapoints_arr[:k]
 
-if len(datapoints_arr) < k:
-    sys.exit("Invalid Input!")
+dict = {}
 
-epsilon = 0.001
-Euclidean_norm = False
-iter_cnt = 1
-point_len = len(datapoints_arr[0])
+for i in range(len(indices)):
+    dict[indices_np[i]] = datapoints_np[i]
 
-datapoints = np.zeros((n, size))
-clusters = np.zeros((k, size))
-M = np.random.choice(datapoints)
-I = [x for x in range(n)]
 
+n = len(input)
+
+#another input check
+if k > n:
+    sys.exit("Invalid Input")
+
+i = 1
+
+clusters = []
+clusters_indices = []
+M = int(np.random.choice(indices))
+
+clusters_indices.append(M)
+clusters.append(dict[M])
+
+#algorithm1
 while i < k:
-    D = [math.inf for y in range(n)]
+    D = [math.inf for x in range(n)]
 
-    for o in range(n):
-        temp = math.inf
+    for l in range(n):
+        Di = [math.pow(np.linalg.norm(dict[l]-dict[clusters_indices[y]]), 2) for y in range (i)]
+        D[l] = min(Di)
 
-        for j in range(i):
 
-            for s in range(size):
-                temp += math.pow((float(datapoints[o, s]) - M[s]), 2)
-
-        if D[o] > temp:
-            D[o] = temp
-
-    for L in range(n):
-        P = [0.0 for x in range(n)]
-        P[L] = D[L] / sum(D)
+    P = np.zeros(n)
+    for l in range(n):
+        P[l] = D[l] / sum(D)
 
     i += 1
-    M = datapoints[int(np.random.choice(I, 1, p=P))]
-    
+    M = int(np.random.choice(indices, 1, p=P))
+    clusters_indices.append(M)
+    clusters.append(dict[M])
+
+#needed result
+res = [str(x) for x in clusters_indices]
+print(','.join(res))
