@@ -106,5 +106,7 @@ while i < k:
     clusters.append(dict[M])
 
 #needed result
+for_km = km.fit(datapoints_np, clusters, k, n, max_iter)
+
 res = [str(x) for x in clusters_indices]
 print(','.join(res))
