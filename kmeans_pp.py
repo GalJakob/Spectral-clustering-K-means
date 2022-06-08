@@ -4,7 +4,6 @@ import sys
 import math
 import mykmeanssp as km
 
-
 #checking for invalid inputs
 num_args = len(sys.argv)
 
@@ -79,6 +78,7 @@ if k > n:
     sys.exit("Invalid Input")
 
 i = 1
+dim = len(datapoints_np[0])
 
 clusters = []
 clusters_indices = []
@@ -106,7 +106,7 @@ while i < k:
     clusters.append(dict[M])
 
 #needed result
-for_km = km.fit(datapoints_np, clusters, k, n, max_iter)
+for_km = km.fit(datapoints_np, clusters, k, max_iter, n, dim,  eps)
 
 res = [str(x) for x in clusters_indices]
 print(','.join(res))
