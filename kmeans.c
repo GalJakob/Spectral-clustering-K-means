@@ -166,12 +166,12 @@ static PyMethodDef myMethods[] = {
 static struct PyModuleDef kmeansMod =
     {
         PyModuleDef_HEAD_INIT,
-        "kmeans_PP",
+        "mykmeanssp",
         "",
         -1,
         myMethods};
 
-PyMODINIT_FUNC initkmeans(void)
+PyMODINIT_FUNC PyInit_mykmeanssp()
 {
     return PyModule_Create(&kmeansMod);
 }
