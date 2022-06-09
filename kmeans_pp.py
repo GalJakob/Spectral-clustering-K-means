@@ -117,7 +117,7 @@ res = [str(x) for x in clusters_indices]
 print(','.join(res))
 for i in range(k):
     for j in range(dim):
-        print((np.round_(for_km[i][j], decimals=4)), end="")
+        print('%.4f' % for_km[i][j], end="")
         if j != dim - 1:
             print(',', end="")
     print("")
