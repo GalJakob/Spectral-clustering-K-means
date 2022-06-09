@@ -115,4 +115,9 @@ for_km = km.fit(datapoints_np, clusters, k, max_iter, n, dim,  eps)
 
 res = [str(x) for x in clusters_indices]
 print(','.join(res))
-print(for_km)
+for i in range(k):
+    for j in range(dim):
+        print((np.round_(for_km[i][j], decimals=4)), end="")
+        if j != dim - 1:
+            print(',', end="")
+    print("")
