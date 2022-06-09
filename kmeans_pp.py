@@ -48,11 +48,6 @@ try:
 except ValueError:
     sys.exit("Invalid Input")
 
-
-input_filename1 = "input_1_db_1.txt"
-input_filename2 = "input_1_db_2.txt"
-k = 3
-
 #seed
 np.random.seed(0)
 
@@ -116,7 +111,8 @@ datapoints_np = datapoints.to_numpy().tolist()
 
 
 for_km = km.fit(datapoints_np, clusters, k, max_iter, n, dim,  eps)
-print(for_km)
+
 
 res = [str(x) for x in clusters_indices]
 print(','.join(res))
+print(for_km)
