@@ -115,9 +115,8 @@ while i < k:
 datapoints_np = datapoints.to_numpy().tolist()
 
 
-print(clusters, "\n")
-print(datapoints_np)
 for_km = km.fit(datapoints_np, clusters, k, max_iter, n, dim,  eps)
+print(for_km)
 
 res = [str(x) for x in clusters_indices]
 print(','.join(res))

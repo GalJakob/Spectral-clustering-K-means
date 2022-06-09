@@ -200,7 +200,7 @@ double **convertPyObjToDP(PyObject *pyPointsArrPtr, int numOfPoints, int numOfCo
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
             (pointsArr)[numOfPointsIdx][numOfCordsIdx] = PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx));
-            /* printf("%f / %d / %d \n",PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx)),numOfPointsIdx,numOfCordsIdx); */
+            printf("%f / %d / %d \n",PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx)),numOfPointsIdx,numOfCordsIdx);
         }
     }
 
