@@ -48,6 +48,7 @@ try:
 except ValueError:
     sys.exit("Invalid Input")
 
+
 input_filename1 = "input_1_db_1.txt"
 input_filename2 = "input_1_db_2.txt"
 k = 3
@@ -89,7 +90,7 @@ clusters_indices = []
 M = int(np.random.choice(indices))
 
 clusters_indices.append(M)
-clusters.append(dict[M])
+clusters.append(list(dict[M]))
 
 #algorithm1
 while i < k:
@@ -107,11 +108,12 @@ while i < k:
     i += 1
     M = int(np.random.choice(indices, 1, p=P))
     clusters_indices.append(M)
-    clusters.append(dict[M])
+    clusters.append(list(dict[M]))
 
 #needed result
 
-datapoints_np =datapoints.to_numpy().tolist()
+datapoints_np = datapoints.to_numpy().tolist()
+
 
 print(clusters, "\n")
 print(datapoints_np)
