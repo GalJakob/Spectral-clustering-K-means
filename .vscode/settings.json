@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdlib.h": "c",
-        "python.h": "c"
+        "python.h": "c",
+        "listobject.h": "c"
     }
 }

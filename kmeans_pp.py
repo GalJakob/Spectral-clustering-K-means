@@ -43,6 +43,10 @@ elif num_args == 6:
 else:
     sys.exit("Invalid Input")
 
+try:
+    eps = float(eps)
+except ValueError:
+    sys.exit("Invalid Input")
 
 input_filename1 = "input_1_db_1.txt"
 input_filename2 = "input_1_db_2.txt"
@@ -55,14 +59,14 @@ np.random.seed(0)
 input1 = pd.read_csv(input_filename1, sep=",", header=None)
 input2 = pd.read_csv(input_filename2, sep=",", header=None)
 input_temp = pd.merge(input1, input2, on =0)
-input = input_temp.sort_values(0)
+input = input_temp.sort_values(by=[0])
 
 
 indices = input.iloc[:,0]
 indices_np = indices.to_numpy()
 
 datapoints = input.drop(columns=[0])
-datapoints_np = datapoints.to_numpy()
+datapoints_np =datapoints.to_numpy()
 
 
 dict = {}
@@ -106,6 +110,11 @@ while i < k:
     clusters.append(dict[M])
 
 #needed result
+
+datapoints_np =datapoints.to_numpy().tolist()
+
+print(clusters, "\n")
+print(datapoints_np)
 for_km = km.fit(datapoints_np, clusters, k, max_iter, n, dim,  eps)
 
 res = [str(x) for x in clusters_indices]

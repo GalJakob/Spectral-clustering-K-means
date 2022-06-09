@@ -8,19 +8,18 @@
 
 #define LINE_LENGTH 256
 #define DEFAULT_MAX_ITER 200
-#define EPSILON 0.001
 
 static PyObject *fit(PyObject *self, PyObject *args);
-PyObject *mainAlgorithm2(double ***, double ***, int, int, int, int);
+PyObject *mainAlgorithm2(double ***, double ***, int, int, int, int, float);
 PyObject *convertDPToPyObj(double ***, int, int);
 double **convertPyObjToDP(PyObject *, int, int);
 
-PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K)
+PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int max_iter, int numOfPoints, int numOfCords, int K, float eps)
 {
-
     int iterCnt = 1;
     int isAllEuclidiansUnderEps = 0; /*boolean*/
     int pointIdx = 0;
+
     while ((iterCnt != max_iter) && (!isAllEuclidiansUnderEps))
     {
         int pointIdxForInitCluster;
@@ -33,14 +32,14 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
 
         if (numOfPointsInCluster == NULL || normDistances == NULL || clustersSumArrPtr == NULL)
         {
-            printf("%s", "An Error Has Occurred");
+            printf("%s", "1 An Error Has Occurred");
         }
         for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
         {
             clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
             if (clustersSumArrPtr[pointIdxForInitCluster] == NULL)
             {
-                printf("%s", "An Error Has Occurred");
+                printf("%s", "2 An Error Has Occurred");
             }
 
             for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
@@ -86,14 +85,16 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
 
             if (newCentroid == NULL || prevCentroid == NULL)
             {
-                printf("%s", "An Error Has Occurred");
+                printf("%s", "3 An Error Has Occurred ");
             }
 
             for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
                 prevCentroid[idxForCent] = (*centroidsArrPtr)[idxForNormCalcs][idxForCent];
             if (!(numOfPointsInCluster[idxForNormCalcs])) /* prevents devision by 0 */
             {
-                printf("%s", "An Error Has Occurred");
+                printf("%s ", "/ 4 An Error Has Occurred ");
+                printf("%d ", numOfPointsInCluster[idxForNormCalcs]);
+                printf("%d ", iterCnt);
             }
 
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
@@ -114,7 +115,7 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
         isAllEuclidiansUnderEps = 1;
         for (idxForNormCalcs = 0; idxForNormCalcs < K; idxForNormCalcs++)
         {
-            if (normDistances[idxForNormCalcs] > EPSILON)
+            if (normDistances[idxForNormCalcs] > eps)
             {
                 isAllEuclidiansUnderEps = 0;
                 break;
@@ -145,23 +146,22 @@ static PyObject *fit(PyObject *self, PyObject *args)
     int K;
     int numOfPoints;
     int numOfCords;
+    float eps;
 
-    if (!PyArg_ParseTuple(args, "OOiiii", &pyPointsArrPtr, &pyCentroidsArrPtr, &K, &max_iter, &numOfPoints, &numOfCords))
+    if (!PyArg_ParseTuple(args, "OOiiiif", &pyPointsArrPtr, &pyCentroidsArrPtr, &K, &max_iter, &numOfPoints, &numOfCords, &eps))
         return NULL;
-
     pointsArr = convertPyObjToDP(pyPointsArrPtr, numOfPoints, numOfCords);
     centroidsArr = convertPyObjToDP(pyCentroidsArrPtr, K, numOfCords);
-    returnedCentroids = Py_BuildValue("O", mainAlgorithm2(&pointsArr, &centroidsArr, max_iter, numOfPoints, numOfCords, K));
+    returnedCentroids = Py_BuildValue("O", mainAlgorithm2(&pointsArr, &centroidsArr, max_iter, numOfPoints, numOfCords, K, eps));
     return returnedCentroids;
 }
 
 static PyMethodDef myMethods[] = {
-        {"fit",
-                (PyCFunction) fit,
-                      METH_VARARGS,
-                         PyDoc_STR("kmeans implement")},
-        {NULL,  NULL, 0, NULL}
-};
+    {"fit",
+     (PyCFunction)fit,
+     METH_VARARGS,
+     PyDoc_STR("kmeans implement")},
+    {NULL, NULL, 0, NULL}};
 
 static struct PyModuleDef kmeansMod =
     {
@@ -178,12 +178,10 @@ PyMODINIT_FUNC PyInit_mykmeanssp()
 double **convertPyObjToDP(PyObject *pyPointsArrPtr, int numOfPoints, int numOfCords)
 {
     double **pointsArr;
-
     PyObject *point;
 
     int numOfCordsIdx = 0;
     int numOfPointsIdx = 0;
-
     pointsArr = (double **)malloc((sizeof(double *)) * numOfPoints);
     if (pointsArr == NULL)
     {
@@ -197,10 +195,12 @@ double **convertPyObjToDP(PyObject *pyPointsArrPtr, int numOfPoints, int numOfCo
         {
             printf("%s", "An Error Has Occurred ");
         }
-        point = PyList_GetItem(pyPointsArrPtr, numOfCordsIdx);
+        point = PyList_GetItem(pyPointsArrPtr, numOfPointsIdx);
+        /* PyObject_Print(point, stdout, 1); */
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
-            pointsArr[numOfCordsIdx][numOfCordsIdx] = PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx));
+            (pointsArr)[numOfPointsIdx][numOfCordsIdx] = PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx));
+            /* printf("%f / %d / %d \n",PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx)),numOfPointsIdx,numOfCordsIdx); */
         }
     }
 
