@@ -32,14 +32,16 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
 
         if (numOfPointsInCluster == NULL || normDistances == NULL || clustersSumArrPtr == NULL)
         {
-            printf("%s", "1 An Error Has Occurred");
+            printf("%s", "An Error Has Occurred");
+            exit(0);
         }
         for (pointIdxForInitCluster = 0; pointIdxForInitCluster < K; pointIdxForInitCluster++)
         {
             clustersSumArrPtr[pointIdxForInitCluster] = (double *)malloc(numOfCords * sizeof(double));
             if (clustersSumArrPtr[pointIdxForInitCluster] == NULL)
             {
-                printf("%s", "2 An Error Has Occurred");
+                printf("%s", "An Error Has Occurred");
+                exit(0);
             }
 
             for (cordForCluster = 0; cordForCluster < numOfCords; cordForCluster++)
@@ -85,16 +87,16 @@ PyObject *mainAlgorithm2(double ***pointsArrPtr, double ***centroidsArrPtr, int 
 
             if (newCentroid == NULL || prevCentroid == NULL)
             {
-                printf("%s", "3 An Error Has Occurred ");
+                printf("%s", "An Error Has Occurred ");
+                exit(0);
             }
 
             for (idxForCent = 0; idxForCent < numOfCords; idxForCent++)
                 prevCentroid[idxForCent] = (*centroidsArrPtr)[idxForNormCalcs][idxForCent];
             if (!(numOfPointsInCluster[idxForNormCalcs])) /* prevents devision by 0 */
             {
-                printf("%s ", "/ 4 An Error Has Occurred ");
-                printf("%d ", numOfPointsInCluster[idxForNormCalcs]);
-                printf("%d ", iterCnt);
+                printf("%s ", "An Error Has Occurred ");
+                exit(0);
             }
 
             for (cordIdxForNorm = 0; cordIdxForNorm < numOfCords; cordIdxForNorm++)
@@ -196,11 +198,9 @@ double **convertPyObjToDP(PyObject *pyPointsArrPtr, int numOfPoints, int numOfCo
             printf("%s", "An Error Has Occurred ");
         }
         point = PyList_GetItem(pyPointsArrPtr, numOfPointsIdx);
-        /* PyObject_Print(point, stdout, 1); */
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
             (pointsArr)[numOfPointsIdx][numOfCordsIdx] = PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx));
-            /* printf("%f / %d / %d \n",PyFloat_AsDouble(PyList_GetItem(point, numOfCordsIdx)),numOfPointsIdx,numOfCordsIdx); */
         }
     }
 
