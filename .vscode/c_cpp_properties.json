@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/User/AppData/Local/Programs/Python/Python39/include"
+                "C:\\Users\\User\\anaconda3\\include"
             ],
             "defines": [
                 "_DEBUG",

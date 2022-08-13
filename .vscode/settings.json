@@ -2,6 +2,11 @@
     "files.associations": {
         "stdlib.h": "c",
         "python.h": "c",
-        "listobject.h": "c"
+        "listobject.h": "c",
+        "string.h": "c",
+        "ctype.h": "c",
+        "stdio.h": "c",
+        "spkmeans.h": "c",
+        "assert.h": "c"
     }
 }
