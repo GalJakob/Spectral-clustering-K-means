@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
 void execByGoal(int k, char *goal, char *filename)
 {
-    
+
     /* executes by given goal,and stops at goal */
 
     /* base variables */
@@ -36,11 +36,40 @@ void execByGoal(int k, char *goal, char *filename)
     double **weightedAdjMat;
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
-   
+    createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
+
     if (!strcmp(goal, "wam")) /* if goal is adjacency */
     {
     }
     else
     {
     }
+}
+
+void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords)
+{
+    int nodeVal;
+    *weightedAdjMat = calloc(sizeof(double *), *numOfPoints);
+    customAssert(*weightedAdjMat != NULL);
+    for (int i = 0; i < *numOfPoints; i++)
+    {
+        (*weightedAdjMat)[i] = calloc(sizeof(double), *numOfPoints);
+        customAssert((*weightedAdjMat)[i] != NULL);
+    }
+
+    for (int rowIdx = 0; rowIdx < *numOfPoints; rowIdx++)
+    {
+        for (int colIdx = rowIdx; colIdx < *numOfPoints; colIdx++)
+        {
+            if (rowIdx == colIdx)
+                continue;
+            nodeVal = exp(-getEuclideanNorm((*pointArrPtr)[rowIdx], (*pointArrPtr)[colIdx], *numOfCords) / 2);
+            printf("%f",nodeVal);
+            (*weightedAdjMat)[rowIdx][colIdx] = nodeVal;
+            (*weightedAdjMat)[colIdx][rowIdx] =   nodeVal;
+        }
+    }
+    printf("%f",(*weightedAdjMat)[1][2]);
+
+    /* code */
 }

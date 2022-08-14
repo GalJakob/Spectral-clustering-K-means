@@ -64,11 +64,9 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     /* this function computes the dimension and number of points */
     char line[LINE_LENGTH];
     char *splittedLine;
-    printf("%s",**inFileNamePtr);
     *filePtr = fopen(**inFileNamePtr, "r");
     customAssert(*filePtr != NULL);
-    
-    exit(0);
+
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;
@@ -92,4 +90,22 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
         printf("%s", "An Error Has Occurred");
         return;
     }
+}
+
+double getEuclideanNorm(double *point1, double *point2, int numOfCords)
+{
+    int idx;
+    double diffBetweenCords;
+    double sum = 0;
+
+    for (idx = 0; idx < numOfCords; idx++)
+    {
+        
+        diffBetweenCords = point1[idx] - point2[idx];
+        diffBetweenCords *= diffBetweenCords;
+        sum += diffBetweenCords;
+    }
+    printf("%f",sum);
+    exit(1);
+    return sqrt(sum);
 }
