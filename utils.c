@@ -7,15 +7,18 @@
 #include <assert.h>
 #define LINE_LENGTH 256
 
-void customAssert(int booleanVal) {
+void customAssert(int booleanVal)
+{
     /* asserting that no unexpected behavior is in the program*/
-    if (!booleanVal) {
+    if (!booleanVal)
+    {
         printf("An Error Has Occured");
         abort();
     }
 }
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg)
 {
+
     /* this functions gets the points from the input file and puts them into an array.
     in addition,computes number of points and point dimension */
 
@@ -30,14 +33,17 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
 
     FILE *filePtr;
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
+
     *numOfCordsArg = numOfCords;
     *numOfPointsArg = numOfPoints;
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
+    customAssert(*pointArrPtr != NULL);
     filePtr = fopen(*inFileNamePtr, "r");
+    customAssert(filePtr != NULL);
     while (fgets(line, LINE_LENGTH, filePtr))
     {
         (*pointArrPtr)[numOfPointsIdx] = (double *)malloc(numOfCords * sizeof(double));
-
+        customAssert((*pointArrPtr)[numOfPointsIdx] != NULL);
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
             if (numOfCordsIdx == 0)
@@ -58,13 +64,11 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     /* this function computes the dimension and number of points */
     char line[LINE_LENGTH];
     char *splittedLine;
+    printf("%s",**inFileNamePtr);
     *filePtr = fopen(**inFileNamePtr, "r");
-    if (*filePtr == NULL)
-    {
-        printf("%s", "An Error Has Occurred");
-        return;
-    }
-
+    customAssert(*filePtr != NULL);
+    
+    exit(0);
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;

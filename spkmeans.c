@@ -35,8 +35,8 @@ void execByGoal(int k, char *goal, char *filename)
 
     double **weightedAdjMat;
 
-    assignPoints(&pointArrPtr, &inFileNamePtr, &numOfPointsArg, &numOfCordsArg);
-
+    assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
+   
     if (!strcmp(goal, "wam")) /* if goal is adjacency */
     {
     }

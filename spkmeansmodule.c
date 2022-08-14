@@ -12,12 +12,11 @@
 
 static PyObject *execByGoalFromPy(PyObject *self, PyObject *args);
 
-
-
 /* ########## gal ########## */
 
 static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
 {
+    
         /*executes the spectral clustering algorithm. called from python*/
         int k;
         char *goal;
