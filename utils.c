@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "spkmeans.h"
 #define LINE_LENGTH 256
 
 void customAssert(int booleanVal)
@@ -107,4 +108,23 @@ double getEuclideanNorm(double *point1, double *point2, int numOfCords)
     }
    
     return sqrt(sum);
+}
+
+double SumMatRow(double * matRow, int n) {
+    double res;
+    res = 0;
+    int i;
+    for (i = 0; i < n; i++){
+        res += matRow[i];
+    }
+
+    return res;
+}
+
+double ** hofchit (double ** ddg, int n){
+    int i;
+    for (i = 0; i < n; i++){
+        ddg[i][i] = 1 / sqrt(ddg[i][i]);
+    }
+    return ddg;
 }
