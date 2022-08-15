@@ -37,7 +37,7 @@ void execByGoal(int k, char *goal, char *filename)
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
-    
+
     if (!strcmp(goal, "wam")) /* if goal is adjacency */
     {
     }
@@ -64,11 +64,11 @@ void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *
             if (rowIdx == colIdx)
                 continue;
             nodeVal = exp(-getEuclideanNorm((*pointArrPtr)[rowIdx], (*pointArrPtr)[colIdx], *numOfCords) / 2);
-           
+
             (*weightedAdjMat)[rowIdx][colIdx] = nodeVal;
-            (*weightedAdjMat)[colIdx][rowIdx] =   nodeVal;
+            (*weightedAdjMat)[colIdx][rowIdx] = nodeVal;
         }
     }
- 
+
     /* code */
 }
