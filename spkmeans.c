@@ -37,8 +37,7 @@ void execByGoal(int k, char *goal, char *filename)
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
-
-    createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfCordsArg);
+    createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
 
     if (!strcmp(goal, "wam")) /* if goal is adjacency */
     {
@@ -75,15 +74,22 @@ void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *
     /* code */
 }
 
-void createDiagonalDegreeMat(double *** ddg, double *** mat, int n)
+void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 {
+   
     int i;
     /*create zero mat*/
-    *ddg = (double **) calloc(n, sizeof(double *));
+    *ddg = (double **)calloc(sizeof(double *), n);
     customAssert(*ddg != NULL);
-    for (i = 0; i < n; i++){
-        (*ddg)[i] = (double *) calloc(n, sizeof(double));
+    for (i = 0; i < n; i++)
+    {
+        (*ddg)[i] = (double *)calloc(sizeof(double), n);
         customAssert((*ddg)[i] != NULL);
-        (*ddg)[i][i] = SumMatRow((*mat)[i], n);
+        (*ddg)[i][i] = SumMatRow((*weightedAdjMat)[i], n);
     }
+    printf("%f \n",(*ddg)[2][2]);
+
+    printf("%f", (*ddg)[4][0]);
+    exit(1);
+
 }
