@@ -106,8 +106,7 @@ double getEuclideanNorm(double *point1, double *point2, int numOfCords)
         diffBetweenCords *= diffBetweenCords;
         sum += diffBetweenCords;
     }
-    printf("%f",sum);
-    exit(1);
+   
     return sqrt(sum);
 }
 
