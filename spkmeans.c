@@ -38,6 +38,9 @@ void execByGoal(int k, char *goal, char *filename)
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
     createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
+    /* LnormFunc */
+    
+    /* performJacobiAlg(LnormMat,numOfPointsArg); */
 
     if (!strcmp(goal, "wam")) /* if goal is adjacency */
     {
@@ -91,5 +94,9 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 
     printf("%f", (*ddg)[4][0]);
     exit(1);
+
+}
+
+void performJacobiAlg(double **LnormMat,int numOfPoints){
 
 }
