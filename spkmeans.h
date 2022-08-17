@@ -2,7 +2,7 @@
 void execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double*** weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double *** res, double *** mat, int n);
-
+void createTheNormalizedGraphLaplacian(double *** lnorm, double *** wam, double *** ddg, int n);
 
 /* utils functions */
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg);
@@ -10,4 +10,5 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
 double getEuclideanNorm(double* point1,double* point2,int numOfCords);
 double SumMatRow(double * matRow, int n);
 double ** hofchit (double ** ddg, int n);
-
+double ** multiplyMats(double **mat1, double **mat2, int n);
+double ** transpose (double ** mat, int n);
