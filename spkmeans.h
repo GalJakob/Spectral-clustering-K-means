@@ -17,4 +17,5 @@ double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
 double **allocateAndCreateP(double phiAngle, int numOfPoints,int pivRow,int pivCol);
 void customFreeForMat(double** mat);
 double ** multiplyMats(double **mat1, double **mat2, int n);
-double ** transpose (double ** mat, int n);/* typedef  */
+double ** transpose (double ** mat, int n);
+/* typedef  */
