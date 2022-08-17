@@ -81,7 +81,6 @@ void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *
 
 void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 {
-
     int i;
     /*create zero mat*/
     *ddg = (double **)calloc(sizeof(double *), n);
@@ -112,14 +111,13 @@ void performJacobiAlg(double **LnormMat, int numOfPoints)
     while (rotIdx <= 100)
     {
         P = buildRotMatP(A, numOfPoints);
-        /* PTranspose = func transpose */
-        /* ATag = func mult */
+        PTranspose =transpose (P, numOfPoints);
+        ATag = multiplyMats(multiplyMats(PTranspose,A,numOfPoints),P,numOfPoints); 
         if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
         {
             /*  customFreeForMat(A); */
             break;
         }
-
         A = ATag;
 
         rotIdx++;
@@ -143,7 +141,7 @@ void createTheNormalizedGraphLaplacian(double *** lnorm, double *** wam, double 
     for (j = 0; j < n; j++){
         for (k = 0; k < n; k++){
             if (j == k){
-                (*lnorm)[j][k] = 1;
+                (*lnorm)[j][k] = 1- (*lnorm)[j][k];
             }
             else {
                 (*lnorm)[j][k] = 0 - (*lnorm)[j][k];

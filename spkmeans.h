@@ -18,4 +18,13 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints,int pivRow,int pivC
 void customFreeForMat(double** mat);
 double ** multiplyMats(double **mat1, double **mat2, int n);
 double ** transpose (double ** mat, int n);
+
 /* typedef  */
+typedef struct LinkedList {
+    double*** pointerToRotMatP;
+    struct node * next;
+} LinkedListOfRotMats;
+typedef struct node {
+    double*** pointerToRotMatP;
+    struct node * next;
+} nodeOfRotMats;
