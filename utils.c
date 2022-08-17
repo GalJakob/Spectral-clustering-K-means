@@ -10,6 +10,7 @@
 #define LINE_LENGTH 256
 #define PI 3.141592653589793
 
+
 void customAssert(int booleanVal)
 {
     /* asserting that no unexpected behavior is in the program*/
@@ -213,8 +214,18 @@ double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
         {
             if (row == col)
                 continue;
-            sum+=(mat[row][col])*(mat[row][col]);
+            sum += (mat[row][col]) * (mat[row][col]);
         }
     }
     return sum;
+}
+void customFreeForMat(double **mat)
+{
+    /* frees memory for mat*/
+    free(mat[0]);
+    free(mat);
+}
+void appendRotMat(double ****allRotMatsPtr, double **P)
+{
+    *allRotMatsPtr = calloc(sizeof(double **), 1);
 }

@@ -15,3 +15,6 @@ double getPivotAndHisIdxs(double **mat, double numOfPoints, int *pivRow, int *pi
 double arcCot(double x);
 double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
 double **allocateAndCreateP(double phiAngle, int numOfPoints,int pivRow,int pivCol);
+void customFreeForMat(double** mat);
+
+/* typedef  */
