@@ -2,7 +2,7 @@
 void execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double*** weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double *** res, double *** mat, int n);
-
+void createTheNormalizedGraphLaplacian(double *** lnorm, double *** wam, double *** ddg, int n);
 
 /* utils functions */
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg);
@@ -16,5 +16,5 @@ double arcCot(double x);
 double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
 double **allocateAndCreateP(double phiAngle, int numOfPoints,int pivRow,int pivCol);
 void customFreeForMat(double** mat);
-
-/* typedef  */
+double ** multiplyMats(double **mat1, double **mat2, int n);
+double ** transpose (double ** mat, int n);/* typedef  */

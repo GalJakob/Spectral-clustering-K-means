@@ -39,6 +39,9 @@ void execByGoal(int k, char *goal, char *filename)
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
+<<<<<<< HEAD
+    createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfCordsArg);
+=======
     createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
     /* LnormFunc */
 
@@ -123,5 +126,108 @@ void performJacobiAlg(double **LnormMat, int numOfPoints)
         A = ATag;
 
         rotIdx++;
+    }
+}
+    *ddg = hofchit(*ddg, n);
+    *lnorm = multiplyMats(*ddg, *wam, n);
+    *lnorm = multiplyMats(*lnorm, *ddg, n);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void createTheNormalizedGraphLaplacian(double *** lnorm, double *** wam, double *** ddg, int n){
+    int i;
+    /*create zero mat*/
+    *lnorm = (double **) calloc(n, sizeof(double *));
+    assert(*lnorm != NULL);
+    for (i = 0; i < n; i++){
+        (*lnorm)[i] = (double *) calloc(n, sizeof(double));
+        assert((*lnorm)[i] != NULL);
+    }
+    *ddg = hofchit(*ddg, n);
+    *lnorm = multiplyMats(*ddg, *wam, n);
+    *lnorm = multiplyMats(*lnorm, *ddg, n);
+
+    int j, k;
+    for (j = 0; j < n; j++){
+        for (k = 0; k < n; k++){
+            if (j == k){
+                (*lnorm)[j][k] = 1;
+            }
+            else {
+                (*lnorm)[j][k] = 0 - (*lnorm)[j][k];
+            }
+        }
     }
 }

@@ -136,6 +136,231 @@ double **hofchit(double **ddg, int n)
     return ddg;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+double ** multiplyMats(double **mat1, double **mat2, int n)
+{
+    printf("%f\n", mat1[0][0] );
+    printf("%f\n", mat2[3][0] );
+    int i, j, k;
+    double **res;
+    res = (double **) calloc(n, sizeof(double *));
+    assert(res != NULL);
+    for (i = 0; i < n; i++) {
+        res[i] = (double *) calloc(n, sizeof(double));
+        assert(res[i] != NULL);
+        for (j = 0; j < n; j++) {
+            for (k = 0; k < n; k++){
+                res[i][j] += mat1[i][k] * mat2[k][j];
+            }
+
+        }
+    }
+    return res;
+}
+
+double ** transpose (double ** mat, int n){
+    int i, j;
+    double **transposeMat;
+    transposeMat = (double **) calloc(n, sizeof(double *));
+    assert(transposeMat != NULL);
+    for (i = 0; i < n; i++){
+        transposeMat[i] = (double *) calloc(n, sizeof(double));
+        assert(transposeMat[i] != NULL);
+        for (j = 0; j < n; j++){
+            transposeMat[i][j] = mat[j][i];
+        }
+    }
+    return transposeMat;
+}
+
 double **buildRotMatP(double **LnormMat, double numOfPoints)
 {
     /* builds the rotation matrix of the Jacobi algorithm */
