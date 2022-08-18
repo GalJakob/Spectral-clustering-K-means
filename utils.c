@@ -7,9 +7,9 @@
 #include <assert.h>
 #include "spkmeans.h"
 
+
 #define LINE_LENGTH 256
 #define PI 3.141592653589793
-
 
 void customAssert(int booleanVal)
 {
@@ -116,8 +116,8 @@ double getEuclideanNorm(double *point1, double *point2, int numOfCords)
 double SumMatRow(double *matRow, int n)
 {
     double res;
-    res = 0;
     int i;
+    res = 0;
     for (i = 0; i < n; i++)
     {
         res += matRow[i];
@@ -136,199 +136,8 @@ double **hofchit(double **ddg, int n)
     return ddg;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 double ** multiplyMats(double **mat1, double **mat2, int n)
 {
-    printf("%f\n", mat1[0][0] );
-    printf("%f\n", mat2[3][0] );
     int i, j, k;
     double **res;
     res = (double **) calloc(n, sizeof(double *));
@@ -361,21 +170,24 @@ double ** transpose (double ** mat, int n){
     return transposeMat;
 }
 
-double **buildRotMatP(double **LnormMat, double numOfPoints)
+double **buildRotMatP(double **LnormMat, int numOfPoints)
 {
     /* builds the rotation matrix of the Jacobi algorithm */
     int pivRow, pivCol;
-    double pivot, phiAngle;
+    double phiAngle;
 
-    pivot = getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
+    getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
     phiAngle = getPhiAngle(LnormMat, pivRow, pivCol);
-    return allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
+   /*   printf("%d\n", pivRow);
+     printf("%d\n", pivCol); */
+       
+    return  allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
 }
 
-double getPivotAndHisIdxs(double **mat, double numOfPoints, int *pivRow, int *pivCol)
+void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 {
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
-    int row, col, pivRow, pivCol;
+    int row, col, pivRow2, pivCol2;
     double elWithMaxAbsVal = 0;
     for (row = 0; row < numOfPoints; row++)
     {
@@ -386,14 +198,14 @@ double getPivotAndHisIdxs(double **mat, double numOfPoints, int *pivRow, int *pi
             if (fabs(mat[row][col]) > fabs(elWithMaxAbsVal))
             {
                 elWithMaxAbsVal = mat[row][col];
-                pivRow = row;
-                pivCol = col;
+                pivRow2 = row;
+                pivCol2 = col;
             }
         }
     }
-    *pivRow = pivRow;
-    *pivCol = pivCol;
-    return elWithMaxAbsVal;
+    *pivRow = pivRow2;
+    *pivCol = pivCol2;
+   
 }
 
 double arcCot(double x)
@@ -413,11 +225,11 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
     /* creates the mat in memory and completes it's build  */
     double **P;
     int row;
-    P = calloc(sizeof(double *), numOfPoints);
+    P = calloc(numOfPoints,sizeof(double *));
     customAssert(P != NULL);
     for (row = 0; row < numOfPoints; row++)
     {
-        P[row] = calloc(sizeof(double), numOfPoints);
+        P[row] = calloc(numOfPoints,sizeof(double));
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
@@ -450,7 +262,17 @@ void customFreeForMat(double **mat)
     free(mat[0]);
     free(mat);
 }
+ /*
 void appendRotMat(double ****allRotMatsPtr, double **P)
 {
-    *allRotMatsPtr = calloc(sizeof(double **), 1);
+    *allRotMatsPtr = calloc(sizeof(double **), 1); 
+}
+*/
+void push(nodeP** head, double** newP) {
+    nodeP * newNode;
+    newNode = (nodeP *) malloc(sizeof(nodeP));
+
+    newNode->pointerToRotMatP = &newP;
+    newNode->next = *head;
+    *head = newNode;
 }
