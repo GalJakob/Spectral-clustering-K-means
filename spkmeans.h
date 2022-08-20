@@ -1,21 +1,18 @@
 #ifndef LINKED_LIST_H_INCLUDED
 #define LINKED_LIST_H_INCLUDED
-
 /* typedef  */
-typedef struct NODE_P nodeP;
-struct NODE_P
-{
-    double ***pointerToRotMatP;
-    nodeP *next;
+struct eigensOfMat {
+    double eigenVal;
+    double *eigenVec;
 };
-#endif
-
+typedef struct eigensOfMat EIGEN;
 /* major functions */
 void execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double ***res, double ***mat, int n);
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n);
 void performJacobiAlg(double **LnormMat, int numOfPoints);
+void createRenormalizedMat(double *** mat,double *** jacobi, int k, int n);
 
 /* utils functions */
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg);
@@ -30,5 +27,13 @@ double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
 double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol);
 void customFreeForMat(double **mat);
 double **multiplyMats(double **mat1, double **mat2, int n);
-double **transpose(double **mat, int n);
-void push(nodeP **head, double **newP);
+double ** transpose (double ** mat, int n, int k);
+double normalizedSumRow(int k, double * row);
+double ** multiplyMatWithVector(double **mat1, double **vec, int n);
+EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints);
+
+/* quicksort */
+void swap(double *a, double *b);
+int partition(double arr[], int low, int high);
+void quickSort(double arr[], int low, int high);
+#endif

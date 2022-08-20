@@ -10,6 +10,7 @@
 #include "spkmeans.h"
 #include "utils.c"
 #define EPSILON 0.00001
+/* EPSILON 0.00001 */
 #define MAX_ROTATIONS 100
 
 int main(int argc, char *argv[])
@@ -30,13 +31,13 @@ int main(int argc, char *argv[])
 void execByGoal(int k, char *goal, char *filename)
 {
     /* executes by given goal,and stops at goal */
-    printf("in expec %s\n", goal);
     /* base variables */
     double **pointArrPtr;
     int numOfPointsArg, numOfCordsArg;
     double **weightedAdjMat;
     double **diagonalDegreeMat;
     double **LnormMat;
+    double **eigenVectorsMat;
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
 
     if (!strcmp(goal, "jacobi"))
@@ -109,21 +110,18 @@ void performJacobiAlg(double **LnormMat, int numOfPoints)
 {
 
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
-    nodeP *headP; /* *newHeadP */
-    int rotIdx;
 
+    int rotIdx, k;
     double **P, **PTranspose, **A, **ATag, **productOfPs;
-    /*  double ***allRotMats; */
-
-    headP = NULL;
+    EIGEN *sortedEIGENS;
     productOfPs = NULL;
     rotIdx = 1;
     A = LnormMat;
-    printf("aaaa %f\n", A[1][0]);
+
     while (rotIdx <= 100)
     {
         P = buildRotMatP(A, numOfPoints);
-        PTranspose = transpose(P, numOfPoints);
+        PTranspose = transpose(P, numOfPoints, numOfPoints);
         ATag = multiplyMats(multiplyMats(PTranspose, A, numOfPoints), P, numOfPoints);
         if (rotIdx == 1)
         {
@@ -138,13 +136,41 @@ void performJacobiAlg(double **LnormMat, int numOfPoints)
         A = ATag;
         rotIdx++;
     }
-
-    printf("%f\n", productOfPs[0][0]);
-    printf("%f\n", productOfPs[1][0]);
-    printf("%f\n", productOfPs[2][0]);
-    printf("%f\n", productOfPs[2][2]);
-
+    sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
+    printf("%f\n", sortedEIGENS[0].eigenVal);
+    quickSortByEigenVal(sortedEIGENS,0, numOfPoints);
     exit(1);
+
+    /*TODO: if (k==0)
+    {
+        
+    } */
+    
+
+    getSortedEigens(A, numOfPoints);
+
+    printf("%f\n", LnormMat[2][2]);
+    printf("%f\n", LnormMat[2][0]);
+    printf("%f\n", LnormMat[1][0]);
+    exit(1);
+}
+
+void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
+{
+    int i, j;
+    /*create zero mat*/
+    *jacobi = transpose(jacobi, n, k);
+    *mat = (double **)calloc(k, sizeof(double *));
+    assert(*mat != NULL);
+    for (i = 0; i < k; i++)
+    {
+        (*mat)[i] = (double *)calloc(n, sizeof(double));
+        assert((*mat)[i] != NULL);
+        for (j = 0; j < n; j++)
+        {
+            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(n, (*jacobi)[i]);
+        }
+    }
 }
 
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n)

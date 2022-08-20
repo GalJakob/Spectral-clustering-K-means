@@ -7,7 +7,6 @@
 #include <assert.h>
 #include "spkmeans.h"
 
-
 #define LINE_LENGTH 256
 #define PI 3.141592653589793
 
@@ -136,38 +135,55 @@ double **hofchit(double **ddg, int n)
     return ddg;
 }
 
-double ** multiplyMats(double **mat1, double **mat2, int n)
+double **multiplyMats(double **mat1, double **mat2, int n)
 {
     int i, j, k;
     double **res;
-    res = (double **) calloc(n, sizeof(double *));
+    res = (double **)calloc(n, sizeof(double *));
     assert(res != NULL);
-    for (i = 0; i < n; i++) {
-        res[i] = (double *) calloc(n, sizeof(double));
+    for (i = 0; i < n; i++)
+    {
+        res[i] = (double *)calloc(n, sizeof(double));
         assert(res[i] != NULL);
-        for (j = 0; j < n; j++) {
-            for (k = 0; k < n; k++){
+        for (j = 0; j < n; j++)
+        {
+            for (k = 0; k < n; k++)
+            {
                 res[i][j] += mat1[i][k] * mat2[k][j];
             }
-
         }
     }
     return res;
 }
 
-double ** transpose (double ** mat, int n){
+double **transpose(double **mat, int n, int k)
+{
     int i, j;
     double **transposeMat;
-    transposeMat = (double **) calloc(n, sizeof(double *));
+    transposeMat = (double **)calloc(k, sizeof(double *));
     assert(transposeMat != NULL);
-    for (i = 0; i < n; i++){
-        transposeMat[i] = (double *) calloc(n, sizeof(double));
+    for (i = 0; i < k; i++)
+    {
+        transposeMat[i] = (double *)calloc(n, sizeof(double));
         assert(transposeMat[i] != NULL);
-        for (j = 0; j < n; j++){
+        for (j = 0; j < n; j++)
+        {
             transposeMat[i][j] = mat[j][i];
         }
     }
     return transposeMat;
+}
+
+double normalizedSumRow(int k, double *row)
+{
+    double res = 0;
+    int i;
+    for (i = 0; i < k; i++)
+    {
+        res += pow(row[i], 2);
+    }
+    res = sqrt(res);
+    return res;
 }
 
 double **buildRotMatP(double **LnormMat, int numOfPoints)
@@ -178,10 +194,10 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
 
     getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
     phiAngle = getPhiAngle(LnormMat, pivRow, pivCol);
-   /*   printf("%d\n", pivRow);
-     printf("%d\n", pivCol); */
-       
-    return  allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
+    /*   printf("%d\n", pivRow);
+      printf("%d\n", pivCol); */
+
+    return allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
 }
 
 void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
@@ -205,7 +221,21 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
     }
     *pivRow = pivRow2;
     *pivCol = pivCol2;
-   
+}
+
+EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
+{
+
+    int idx;
+    EIGEN *eigenArr;
+    eigenArr = (EIGEN *)calloc(numOfPoints, sizeof(EIGEN));
+    customAssert(eigenArr != NULL);
+    for (idx = 0; idx < numOfPoints; idx++)
+    {
+        eigenArr[idx].eigenVec = &productOfPs[0][idx];
+        eigenArr[idx].eigenVal = A[idx][idx];
+    }
+    return eigenArr;
 }
 
 double arcCot(double x)
@@ -225,11 +255,11 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
     /* creates the mat in memory and completes it's build  */
     double **P;
     int row;
-    P = calloc(numOfPoints,sizeof(double *));
+    P = calloc(numOfPoints, sizeof(double *));
     customAssert(P != NULL);
     for (row = 0; row < numOfPoints; row++)
     {
-        P[row] = calloc(numOfPoints,sizeof(double));
+        P[row] = calloc(numOfPoints, sizeof(double));
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
@@ -256,23 +286,79 @@ double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
     }
     return sum;
 }
+
 void customFreeForMat(double **mat)
 {
     /* frees memory for mat*/
     free(mat[0]);
     free(mat);
 }
- /*
+double **multiplyMatWithVector(double **mat1, double **vec, int n)
+{
+
+    int i, j, k, p;
+    double **res;
+    res = (double **)calloc(n, sizeof(double *));
+    assert(res != NULL);
+    for (i = 0; i < n; i++)
+    {
+        res[i] = (double *)calloc(1, sizeof(double));
+        assert(res[i] != NULL);
+    }
+    for (p = 0; p < n; p++)
+    {
+        for (j = 0; j < 1; j++)
+        {
+            for (k = 0; k < n; k++)
+            {
+                res[p][j] += mat1[p][k] * vec[k][j];
+            }
+        }
+    }
+    return res;
+}
+
+/*
 void appendRotMat(double ****allRotMatsPtr, double **P)
 {
-    *allRotMatsPtr = calloc(sizeof(double **), 1); 
+   *allRotMatsPtr = calloc(sizeof(double **), 1);
 }
 */
-void push(nodeP** head, double** newP) {
-    nodeP * newNode;
-    newNode = (nodeP *) malloc(sizeof(nodeP));
 
-    newNode->pointerToRotMatP = &newP;
-    newNode->next = *head;
-    *head = newNode;
+void swap(EIGEN *a, EIGEN *b)
+{
+   EIGEN* temp;
+    temp = a;
+    *a = *b;
+    *b = *temp;
+}
+
+int partition(EIGEN *arr, int low, int high)
+{
+    double pivot;
+    int i, j;
+    i = low - 1;
+    pivot = arr[high].eigenVal;
+    for (j = low; j < high; j++)
+    {
+        if (arr[j].eigenVal <= pivot)
+        {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+
+    return i + 1;
+}
+
+void quickSortByEigenVal(EIGEN *arr, int low, int high)
+{
+    if (low < high)
+    {
+        int pivotIdx;
+        pivotIdx = partition(arr, low, high);
+        quickSort(arr, low, pivotIdx - 1);
+        quickSort(arr, pivotIdx + 1, high);
+    }
 }
