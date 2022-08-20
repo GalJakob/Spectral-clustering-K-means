@@ -38,19 +38,25 @@ void execByGoal(int k, char *goal, char *filename)
     double **diagonalDegreeMat;
     double **LnormMat;
     double **eigenVectorsMat;
+    double **finalMat;
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
 
     if (!strcmp(goal, "jacobi"))
     {
         printf("in expec %f\n", pointArrPtr[0][0]);
-        performJacobiAlg(pointArrPtr, numOfPointsArg);
+        performJacobiAlg(pointArrPtr, numOfPointsArg, &k, eigenVectorsMat);
         exit(1);
     }
 
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
     createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
     createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
-    performJacobiAlg(LnormMat, numOfPointsArg);
+    performJacobiAlg(LnormMat, numOfPointsArg, &k, eigenVectorsMat);
+    createRenormalizedMat(&finalMat, &eigenVectorsMat, k, numOfPointsArg);
+    
+    printf("final mat  %f\n", finalMat[0][0]);
+    printf("in expec %f\n", finalMat[1][0]);
+    exit(1);
     k = 3;
     if (k == 3)
     {
@@ -106,13 +112,12 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
     }
 }
 
-void performJacobiAlg(double **LnormMat, int numOfPoints)
+void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double **eigenVecsMat)
 {
 
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
-
-    int rotIdx, k;
-    double **P, **PTranspose, **A, **ATag, **productOfPs;
+    int rotIdx;
+    double **P, **PTranspose, **A, **ATag, **productOfPs, **kVecsMat;
     EIGEN *sortedEIGENS;
     productOfPs = NULL;
     rotIdx = 1;
@@ -136,22 +141,13 @@ void performJacobiAlg(double **LnormMat, int numOfPoints)
         A = ATag;
         rotIdx++;
     }
+
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
-    printf("%f\n", sortedEIGENS[0].eigenVal);
-    quickSortByEigenVal(sortedEIGENS,0, numOfPoints);
-    exit(1);
-
-    /*TODO: if (k==0)
-    {
-        
-    } */
-    
-
-    getSortedEigens(A, numOfPoints);
-
-    printf("%f\n", LnormMat[2][2]);
-    printf("%f\n", LnormMat[2][0]);
-    printf("%f\n", LnormMat[1][0]);
+    quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
+    if (!(*k))
+        *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
+    kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
+    eigenVecsMat = kVecsMat;
     exit(1);
 }
 
@@ -159,7 +155,7 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
 {
     int i, j;
     /*create zero mat*/
-    *jacobi = transpose(jacobi, n, k);
+    *jacobi = transpose(*jacobi, n, k);
     *mat = (double **)calloc(k, sizeof(double *));
     assert(*mat != NULL);
     for (i = 0; i < k; i++)

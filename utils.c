@@ -226,13 +226,18 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
 {
 
-    int idx;
+    int idx, idxForTempVec;
     EIGEN *eigenArr;
+    double *tempVec;
     eigenArr = (EIGEN *)calloc(numOfPoints, sizeof(EIGEN));
     customAssert(eigenArr != NULL);
     for (idx = 0; idx < numOfPoints; idx++)
     {
-        eigenArr[idx].eigenVec = &productOfPs[0][idx];
+        tempVec = calloc(numOfPoints, sizeof(double));
+        for (idxForTempVec = 0; idxForTempVec < numOfPoints; idxForTempVec++)
+            tempVec[idxForTempVec] = productOfPs[idxForTempVec][idx];
+
+        eigenArr[idx].eigenVec = tempVec;
         eigenArr[idx].eigenVal = A[idx][idx];
     }
     return eigenArr;
@@ -327,21 +332,26 @@ void appendRotMat(double ****allRotMatsPtr, double **P)
 
 void swap(EIGEN *a, EIGEN *b)
 {
-   EIGEN* temp;
-    temp = a;
+   
+    EIGEN *temp;
+    temp = malloc(sizeof(EIGEN));
+    customAssert(temp != NULL);
+    *temp = *a;
     *a = *b;
     *b = *temp;
+    free(temp);
 }
 
 int partition(EIGEN *arr, int low, int high)
 {
     double pivot;
     int i, j;
+    /* -3 ,5,-9    i=1*/
     i = low - 1;
     pivot = arr[high].eigenVal;
     for (j = low; j < high; j++)
     {
-        if (arr[j].eigenVal <= pivot)
+        if (arr[j].eigenVal >= pivot)
         {
             i++;
             swap(&arr[i], &arr[j]);
@@ -358,7 +368,44 @@ void quickSortByEigenVal(EIGEN *arr, int low, int high)
     {
         int pivotIdx;
         pivotIdx = partition(arr, low, high);
-        quickSort(arr, low, pivotIdx - 1);
-        quickSort(arr, pivotIdx + 1, high);
+        quickSortByEigenVal(arr, low, pivotIdx - 1);
+        quickSortByEigenVal(arr, pivotIdx + 1, high);
     }
+}
+
+int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints)
+{
+    int maxDiffIdx, idx;
+    double maxDiff, currDiff;
+    maxDiffIdx = 0;
+    maxDiff = EIGENS[1].eigenVal - EIGENS[0].eigenVal;
+    for (idx = 1; idx < numOfPoints / 2; idx++)
+    {
+        currDiff = EIGENS[idx + 1].eigenVal - EIGENS[idx].eigenVal;
+        if (currDiff > maxDiff)
+        {
+            maxDiffIdx = idx;
+            maxDiff = currDiff;
+        }
+    }
+    return maxDiffIdx + 1;
+}
+
+double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k)
+{
+    int idx, rowIdx, colIdx;
+    double **kVecsMat;
+    kVecsMat = (double **)calloc(numOfPoints, sizeof(double *));
+    customAssert(kVecsMat != NULL);
+    for (idx = 0; idx < numOfPoints; idx++)
+    {
+        kVecsMat[idx] = (double *)calloc(k, sizeof(double));
+        customAssert(kVecsMat[idx] != NULL);
+    }
+    for (colIdx = 0; colIdx < k; colIdx++)
+    {
+        for (rowIdx = 0; rowIdx < numOfPoints; rowIdx++)
+            kVecsMat[rowIdx][colIdx] = EIGENS[colIdx].eigenVec[rowIdx];
+    }
+    return kVecsMat;
 }

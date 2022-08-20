@@ -11,7 +11,7 @@ void execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double ***res, double ***mat, int n);
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n);
-void performJacobiAlg(double **LnormMat, int numOfPoints);
+void performJacobiAlg(double **LnormMat, int numOfPoints,int*k,double **eigenVecsMat);
 void createRenormalizedMat(double *** mat,double *** jacobi, int k, int n);
 
 /* utils functions */
@@ -30,10 +30,12 @@ double **multiplyMats(double **mat1, double **mat2, int n);
 double ** transpose (double ** mat, int n, int k);
 double normalizedSumRow(int k, double * row);
 double ** multiplyMatWithVector(double **mat1, double **vec, int n);
+int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints);
+double ** createKVecsMat(EIGEN *EIGENS,int numOfPoints, int k);
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints);
 
 /* quicksort */
-void swap(double *a, double *b);
-int partition(double arr[], int low, int high);
-void quickSort(double arr[], int low, int high);
+void swap(EIGEN *a, EIGEN *b);
+int partition(EIGEN *arr, int low, int high);
+void quickSortByEigenVal(EIGEN *arr, int low, int high);
 #endif
