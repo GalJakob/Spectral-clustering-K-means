@@ -39,6 +39,7 @@ void execByGoal(int k, char *goal, char *filename)
     double **LnormMat;
     double **eigenVectorsMat;
     double **finalMat;
+    eigenVectorsMat = NULL;
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
 
     if (!strcmp(goal, "jacobi"))
@@ -53,7 +54,7 @@ void execByGoal(int k, char *goal, char *filename)
     createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
     performJacobiAlg(LnormMat, numOfPointsArg, &k, eigenVectorsMat);
     createRenormalizedMat(&finalMat, &eigenVectorsMat, k, numOfPointsArg);
-    
+
     printf("final mat  %f\n", finalMat[0][0]);
     printf("in expec %f\n", finalMat[1][0]);
     exit(1);
@@ -148,13 +149,14 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double **eigen
         *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
     kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
     eigenVecsMat = kVecsMat;
-    exit(1);
 }
 
 void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
 {
     int i, j;
     /*create zero mat*/
+    printf("in expec %f\n", (*jacobi)[1][0]);
+    exit(1);
     *jacobi = transpose(*jacobi, n, k);
     *mat = (double **)calloc(k, sizeof(double *));
     assert(*mat != NULL);
