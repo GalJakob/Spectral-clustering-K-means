@@ -39,36 +39,44 @@ void execByGoal(int k, char *goal, char *filename)
     double **LnormMat;
     double **eigenVectorsMat;
     double **finalMat;
+    EIGEN *sortedEigensPtr;
     eigenVectorsMat = NULL;
+    sortedEigensPtr = NULL;
     finalMat = NULL;
+
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
-
-    if (!strcmp(goal, "jacobi"))
+    if (!strcmp(goal, "jacobi")) /*  if goal is jacobi */
     {
-        printf("in expec %f\n", pointArrPtr[0][0]);
-        performJacobiAlg(pointArrPtr, numOfPointsArg, &k, eigenVectorsMat);
+        performJacobiAlg(pointArrPtr, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
+        printJacobiResults(numOfPointsArg, k, eigenVectorsMat, sortedEigensPtr);
+        /*         freeMatrix(matrix);
+                 freeMatrix(eigenvectorsMatrix); */
     }
 
-    createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
-    createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
-    createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
-    performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat);
-    createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
+    else /* all other goals are part of spk */
+    {
+        createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
+        if (!strcmp(goal, "wam"))
+            printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
+        else
+        {
+            createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
+            if (!strcmp(goal, "ddg"))
+                printMat(diagonalDegreeMat, numOfPointsArg, numOfPointsArg);
+            else
+            {
+                createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
+                if (!strcmp(goal, "lnorm"))
+                    printMat(LnormMat, numOfPointsArg, numOfPointsArg);
+                else /* spk */
+                {
+                    performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
+                    createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
+                    exit(1);
+                }
+            }
+        }
 
-    printf("final mat  %f\n", finalMat[0][0]);
-    printf("in expec %f\n", finalMat[1][0]);
-   
-    k = 3;
-    if (k == 3)
-    {
-        /* code */
-    }
-
-    if (!strcmp(goal, "wam")) /* if goal is adjacency */
-    {
-    }
-    else
-    {
     }
 }
 
@@ -113,7 +121,7 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
     }
 }
 
-void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat)
+void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat, EIGEN **sortedEigensPtr)
 {
 
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
@@ -149,6 +157,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
     kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
     *eigenVecsMat = kVecsMat;
+    *sortedEigensPtr = sortedEIGENS;
 }
 
 void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)

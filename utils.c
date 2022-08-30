@@ -39,6 +39,8 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
 
     *numOfCordsArg = numOfCords;
     *numOfPointsArg = numOfPoints;
+
+   
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
     customAssert(*pointArrPtr != NULL);
     filePtr = fopen(*inFileNamePtr, "r");
@@ -59,6 +61,7 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
         numOfPointsIdx++;
         numOfCordsIdx = 0;
     }
+
     fclose(filePtr);
 }
 
@@ -73,6 +76,7 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;
+       
         if (*numOfCords != 0)
             continue;
         else
@@ -183,7 +187,7 @@ double normalizedSumRow(int k, double *row)
         res += pow(row[i], 2);
     }
     res = sqrt(res);
-    printf("sum  %f\n", res);
+  
     return res;
 }
 
@@ -333,7 +337,7 @@ void appendRotMat(double ****allRotMatsPtr, double **P)
 
 void swap(EIGEN *a, EIGEN *b)
 {
-   
+
     EIGEN *temp;
     temp = malloc(sizeof(EIGEN));
     customAssert(temp != NULL);
@@ -409,4 +413,30 @@ double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k)
             kVecsMat[rowIdx][colIdx] = EIGENS[colIdx].eigenVec[rowIdx];
     }
     return kVecsMat;
+}
+
+void printJacobiResults(int numOfPointsArg, int k, double **eigenVectorsMat, EIGEN *sortedEigensPtr)
+{
+    /* prints the eigen values and then the eigen vectors */
+
+    int sortedEigIdx;
+    for (sortedEigIdx = 0; sortedEigIdx < numOfPointsArg; sortedEigIdx++)
+        sortedEigIdx != numOfPointsArg - 1 ? printf("%.4f,", sortedEigensPtr[sortedEigIdx].eigenVal) : printf("%.4f\n", sortedEigensPtr[sortedEigIdx].eigenVal);
+    printMat(eigenVectorsMat, numOfPointsArg, k);
+}
+
+void printMat(double **mat, int numOfRows, int numOfCols)
+{
+    int rowIdx;
+    int colIdx;
+    for (rowIdx = 0; rowIdx < numOfRows; rowIdx++)
+    {
+        for (colIdx = 0; colIdx < numOfCols; colIdx++)
+        {
+            if (colIdx != numOfCols - 1)
+                printf("%.4f,", mat[rowIdx][colIdx]);
+            else
+                rowIdx != numOfRows - 1 ? printf("%.4f\n", mat[rowIdx][colIdx]) : printf("%.4f", mat[rowIdx][colIdx]);
+        }
+    }
 }
