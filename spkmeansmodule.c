@@ -62,17 +62,17 @@ static PyObject *renomlizedMatToPy(PyObject *self, PyObject *args)
     fprintf(test, "%s", "1");
     fclose(test);
 
-    if (!PyArg_ParseTuple(args, "si", &filename, &k)){
+    /* if (!PyArg_ParseTuple(args, "si", &filename, &k)){
         return NULL;
-    }
+    } */
     d; // need to calculate
     size = d[0];
     cords = d[1];
 
     vec; // need to read from file
-    mat = finalMat // needs to be here but can't assign
+  /*   mat = finalMat // needs to be here but can't assign
     matP = createPyMat(mat, size, k);
-
+ */
     return matP;
 }
 
@@ -114,10 +114,10 @@ static PyObject *execGoal(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    d; // need to calculate
+   /*  d; // need to calculate
     vAmount = d[0];
     vLength = d[1];
-
+ */
     vecs = // need to read from file
     goalMat; // goal mat needs to be here
     if (!strcmp(goal, "jacobi")){
@@ -133,7 +133,6 @@ static PyObject *execGoal(PyObject *self, PyObject *args)
 // don't know if we need this. plz check :)
 static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
 {
-
     /*executes the spectral clustering algorithm. called from python*/
     int k;
     char *goal;

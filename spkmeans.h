@@ -11,7 +11,7 @@ void execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double ***res, double ***mat, int n);
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n);
-void performJacobiAlg(double **LnormMat, int numOfPoints,int*k,double **eigenVecsMat);
+void performJacobiAlg(double **LnormMat, int numOfPoints,int*k,double ***eigenVecsMat);
 void createRenormalizedMat(double *** mat,double *** jacobi, int *k, int n);
 
 /* utils functions */

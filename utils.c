@@ -183,6 +183,7 @@ double normalizedSumRow(int k, double *row)
         res += pow(row[i], 2);
     }
     res = sqrt(res);
+    printf("sum  %f\n", res);
     return res;
 }
 

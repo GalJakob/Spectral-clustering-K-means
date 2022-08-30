@@ -40,24 +40,24 @@ void execByGoal(int k, char *goal, char *filename)
     double **eigenVectorsMat;
     double **finalMat;
     eigenVectorsMat = NULL;
+    finalMat = NULL;
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
 
     if (!strcmp(goal, "jacobi"))
     {
         printf("in expec %f\n", pointArrPtr[0][0]);
         performJacobiAlg(pointArrPtr, numOfPointsArg, &k, eigenVectorsMat);
-        exit(1);
     }
 
     createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
     createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
     createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
-    performJacobiAlg(LnormMat, numOfPointsArg, &k, eigenVectorsMat);
+    performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat);
     createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
 
     printf("final mat  %f\n", finalMat[0][0]);
     printf("in expec %f\n", finalMat[1][0]);
-    exit(1);
+   
     k = 3;
     if (k == 3)
     {
@@ -113,7 +113,7 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
     }
 }
 
-void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double **eigenVecsMat)
+void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat)
 {
 
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
@@ -148,7 +148,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double **eigen
     if (!(*k))
         *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
     kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
-    eigenVecsMat = kVecsMat;
+    *eigenVecsMat = kVecsMat;
 }
 
 void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
@@ -156,9 +156,8 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
     int i, j;
     /*create zero mat*/
 
-    printf("in expec %f\n", (*jacobi)[1][0]);
-    exit(1);
     *jacobi = transpose(*jacobi, n, *k);
+
     *mat = (double **)calloc(*k, sizeof(double *));
     assert(*mat != NULL);
     for (i = 0; i < *k; i++)
