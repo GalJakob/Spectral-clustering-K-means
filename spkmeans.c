@@ -53,7 +53,7 @@ void execByGoal(int k, char *goal, char *filename)
     createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
     createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
     performJacobiAlg(LnormMat, numOfPointsArg, &k, eigenVectorsMat);
-    createRenormalizedMat(&finalMat, &eigenVectorsMat, k, numOfPointsArg);
+    createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
 
     printf("final mat  %f\n", finalMat[0][0]);
     printf("in expec %f\n", finalMat[1][0]);
@@ -151,16 +151,17 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double **eigen
     eigenVecsMat = kVecsMat;
 }
 
-void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
+void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
 {
     int i, j;
     /*create zero mat*/
+
     printf("in expec %f\n", (*jacobi)[1][0]);
     exit(1);
-    *jacobi = transpose(*jacobi, n, k);
-    *mat = (double **)calloc(k, sizeof(double *));
+    *jacobi = transpose(*jacobi, n, *k);
+    *mat = (double **)calloc(*k, sizeof(double *));
     assert(*mat != NULL);
-    for (i = 0; i < k; i++)
+    for (i = 0; i < *k; i++)
     {
         (*mat)[i] = (double *)calloc(n, sizeof(double));
         assert((*mat)[i] != NULL);
