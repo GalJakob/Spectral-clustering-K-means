@@ -8,7 +8,7 @@ struct eigensOfMat
 };
 typedef struct eigensOfMat EIGEN;
 /* major functions */
-void execByGoal(int k, char *goal, char *filename);
+double** execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double ***res, double ***mat, int n);
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n);
@@ -33,6 +33,7 @@ double normalizedSumRow(int k, double *row);
 double **multiplyMatWithVector(double **mat1, double **vec, int n);
 int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints);
 double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k);
+int getNumOfPoints(char *fileName);
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints);
 
 /* print functions */

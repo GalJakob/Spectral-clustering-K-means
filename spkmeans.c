@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void execByGoal(int k, char *goal, char *filename)
+double **execByGoal(int k, char *goal, char *filename)
 {
     /* executes by given goal,and stops at goal */
     /* base variables */
-    double **pointArrPtr;
     int numOfPointsArg, numOfCordsArg;
+    double **pointArrPtr;
     double **weightedAdjMat;
     double **diagonalDegreeMat;
     double **LnormMat;
@@ -52,9 +52,9 @@ void execByGoal(int k, char *goal, char *filename)
         /*         freeMatrix(matrix);
                  freeMatrix(eigenvectorsMatrix); */
     }
-
     else /* all other goals are part of spk */
     {
+        
         createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
         if (!strcmp(goal, "wam"))
             printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
@@ -72,12 +72,14 @@ void execByGoal(int k, char *goal, char *filename)
                 {
                     performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
                     createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
-                    exit(1);
                 }
             }
         }
-
     }
+    if (!strcmp(goal, "spk"))
+        return finalMat;
+    else
+        return NULL;
 }
 
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords)
@@ -172,6 +174,9 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
     for (i = 0; i < *k; i++)
     {
         (*mat)[i] = (double *)calloc(n, sizeof(double));
+
+        /* size_t n = sizeof((*mat)[i]);
+        printf("%d\n", ); */
         assert((*mat)[i] != NULL);
         for (j = 0; j < n; j++)
         {

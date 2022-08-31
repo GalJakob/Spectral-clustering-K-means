@@ -1,4 +1,5 @@
 #define PY_SSIZE_T_CLEAN
+#define SIZEOF(arr) sizeof(arr) / sizeof(double)
 
 #include <stdlib.h>
 #include <string.h>
@@ -141,15 +142,25 @@ static PyObject *execGoal(PyObject *self, PyObject *args)
 
 static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
 {
+  
     /*executes the spectral clustering algorithm. called from python*/
     int k;
     char *goal;
     char *fileName;
+    double **nKMatForKmeansPP;
+    int numOfPoints;
 
     if (!PyArg_ParseTuple(args, "iss", &k, &goal, &fileName))
         return NULL;
-    execByGoal(k, goal, fileName);
-    Py_RETURN_NONE;
+    numOfPoints = getNumOfPoints(fileName);    
+    nKMatForKmeansPP = execByGoal(k, goal, fileName);
+    if (nKMatForKmeansPP == NULL)
+        Py_RETURN_NONE;
+    else
+    {
+        printf("%d\n", numOfPoints);
+        /* return createPyMat(nKMatForKmeansPP); k rows and numofpoints cols */
+    }
 }
 
 // needs to complete this

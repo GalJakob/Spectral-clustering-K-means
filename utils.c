@@ -40,7 +40,6 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     *numOfCordsArg = numOfCords;
     *numOfPointsArg = numOfPoints;
 
-   
     *pointArrPtr = (double **)malloc((sizeof(double *)) * numOfPoints);
     customAssert(*pointArrPtr != NULL);
     filePtr = fopen(*inFileNamePtr, "r");
@@ -76,7 +75,7 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;
-       
+
         if (*numOfCords != 0)
             continue;
         else
@@ -97,6 +96,24 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
         printf("%s", "An Error Has Occurred");
         return;
     }
+}
+int getNumOfPoints(char *fileName)
+{
+    int numOfPoints;
+    FILE *filePtr;
+    char line[LINE_LENGTH];
+    char *splittedLine;
+    filePtr = fopen(fileName, "r");
+    customAssert(filePtr != NULL);
+    numOfPoints = 0;
+    while (fgets(line, LINE_LENGTH, filePtr))
+        numOfPoints++;
+    if (fclose(filePtr) != 0)
+    {
+        printf("%s", "An Error Has Occurred");
+        return;
+    }
+    return numOfPoints;
 }
 
 double getEuclideanNorm(double *point1, double *point2, int numOfCords)
@@ -187,7 +204,7 @@ double normalizedSumRow(int k, double *row)
         res += pow(row[i], 2);
     }
     res = sqrt(res);
-  
+
     return res;
 }
 
