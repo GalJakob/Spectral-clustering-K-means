@@ -54,7 +54,6 @@ double **execByGoal(int k, char *goal, char *filename)
     }
     else /* all other goals are part of spk */
     {
-        
         createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
         if (!strcmp(goal, "wam"))
             printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
@@ -65,6 +64,7 @@ double **execByGoal(int k, char *goal, char *filename)
                 printMat(diagonalDegreeMat, numOfPointsArg, numOfPointsArg);
             else
             {
+                
                 createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
                 if (!strcmp(goal, "lnorm"))
                     printMat(LnormMat, numOfPointsArg, numOfPointsArg);
@@ -76,10 +76,12 @@ double **execByGoal(int k, char *goal, char *filename)
             }
         }
     }
+
     if (!strcmp(goal, "spk"))
         return finalMat;
     else
         return NULL;
+
 }
 
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords)
@@ -167,20 +169,18 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
     int i, j;
     /*create zero mat*/
 
-    *jacobi = transpose(*jacobi, n, *k);
+   /*  *jacobi = transpose(*jacobi, n, *k); */
 
-    *mat = (double **)calloc(*k, sizeof(double *));
+    *mat = (double **)calloc(n, sizeof(double *));
     assert(*mat != NULL);
-    for (i = 0; i < *k; i++)
+    for (i = 0; i < n; i++)
     {
-        (*mat)[i] = (double *)calloc(n, sizeof(double));
+        (*mat)[i] = (double *)calloc(*k, sizeof(double));
 
-        /* size_t n = sizeof((*mat)[i]);
-        printf("%d\n", ); */
         assert((*mat)[i] != NULL);
-        for (j = 0; j < n; j++)
+        for (j = 0; j < *k; j++)
         {
-            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(n, (*jacobi)[i]);
+            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(*k, (*jacobi)[i]);
         }
     }
 }

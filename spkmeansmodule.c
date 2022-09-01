@@ -157,10 +157,7 @@ static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
     if (nKMatForKmeansPP == NULL)
         Py_RETURN_NONE;
     else
-    {
-        printf("%d\n", numOfPoints);
-        /* return createPyMat(nKMatForKmeansPP); k rows and numofpoints cols */
-    }
+        return createPyMat(nKMatForKmeansPP,numOfPoints,k);/*  k rows and numofpoints cols */
 }
 
 // needs to complete this
