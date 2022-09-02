@@ -13,6 +13,7 @@
 /* EPSILON 0.00001 */
 #define MAX_ROTATIONS 100
 
+
 int main(int argc, char *argv[])
 {
     int k;
@@ -215,3 +216,4 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
         }
     }
 }
+

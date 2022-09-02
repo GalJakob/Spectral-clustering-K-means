@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import sys
 import numpy as np
 import pandas as pd
@@ -9,15 +10,13 @@ np.random.seed(0)
 def kMeansPP(dataPoints,n,k):
     """ creates k centroids for kMeans """
     pdPoints = pd.DataFrame(dataPoints)
-    sortedByFirstCol = pdPoints.sort_values(by=[0])
+    pdPoints.insert(0, "0", [i for i in range(n)], True)
     indices = pdPoints.iloc[:, 0]
+     
     indices_np = indices.to_numpy()
-    print(indices_np)
 
-    datapoints = sortedByFirstCol.drop(columns=[0])
-    print(dataPoints)
+    datapoints = pdPoints.drop(columns="0")
     datapoints_np =datapoints.to_numpy()
-
     dict = {}
 
     for i in range(len(indices)):
@@ -28,19 +27,12 @@ def kMeansPP(dataPoints,n,k):
     clusters = []
     clusters_indices = []
     M = int(np.random.choice(indices))
-
     clusters_indices.append(M)
     clusters.append(list(dict[M]))
-
-    print("cl  \n",clusters)
-    print("ind    \n",clusters_indices)
-    print(datapoints_np)
-    return
 
     i = 1
     while i < k:
         D = [math.inf for x in range(n)]
-
         for l in range(n):
             Di = [math.pow(np.linalg.norm(dict[l]-dict[clusters_indices[y]]), 2) for y in range (i)]
             D[l] = min(Di)
@@ -55,7 +47,7 @@ def kMeansPP(dataPoints,n,k):
         clusters.append(list(dict[M]))
 
     datapoints_np = datapoints.to_numpy().tolist()
-    return datapoints_np
+    return clusters
 
 
 def main():
@@ -63,12 +55,15 @@ def main():
     goal = sys.argv[2]
     fileName = sys.argv[3]
     nKMat = spkmeansmodule.execByGoalFromPy(k, goal, fileName)
-    pointsArr = np.array(nKMat)
-    clusters = kMeansPP(pointsArr,len(pointsArr),k)
-    print(clusters)
-    # dataPointsArray = np.array(dataPoints)
-    # clusters = Kmeansplusplus(dataPointsArray)
-    # spkmeansmodule.kmeans(dataPoints, clusters, np.size(dataPointsArray, 1))
+    if(nKMat!=None):
+        pointsArrNP = np.array(nKMat)
+        clusters = kMeansPP(pointsArrNP,len(pointsArrNP),k)
+        datapoints_np = pointsArrNP.tolist()
+        centroids = spkmeansmodule.fit(datapoints_np, clusters, k, len(datapoints_np),len(datapoints_np[0]))
+        print(centroids)
+
+    return
+   
 
 
 if __name__ == '__main__':

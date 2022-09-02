@@ -1,3 +1,5 @@
+
+
 #ifndef LINKED_LIST_H_INCLUDED
 #define LINKED_LIST_H_INCLUDED
 /* typedef  */
@@ -34,6 +36,8 @@ double **multiplyMatWithVector(double **mat1, double **vec, int n);
 int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints);
 double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k);
 int getNumOfPoints(char *fileName);
+
+
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints);
 
 /* print functions */
