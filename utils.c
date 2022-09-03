@@ -234,6 +234,29 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
     return allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
 }
 
+double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol)
+{
+    /* creates the mat in memory and completes it's build  */
+
+    double **P;
+    int row;
+    P = calloc(numOfPoints, sizeof(double *));
+    customAssert(P != NULL);
+    for (row = 0; row < numOfPoints; row++)
+    {
+        P[row] = calloc(numOfPoints, sizeof(double));
+        customAssert(P[row] != NULL);
+        P[row][row] = 1;
+    }
+    P[pivRow][pivRow] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
+    P[pivCol][pivCol] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
+    P[pivRow][pivCol] = sin(phiAngle); /* s */   /* TODO:check extreme cases */
+    P[pivCol][pivRow] = -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
+    /* TODO:check where can free */
+
+    return P;
+}
+
 void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 {
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
@@ -292,27 +315,6 @@ double getPhiAngle(double **LnormMat, int pivRow, int pivCol)
     double PhiAngle2Times = (LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
     return arcCot(PhiAngle2Times) / 2;
 }
-double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol)
-{
-    /* creates the mat in memory and completes it's build  */
-
-    double **P;
-    int row;
-    P = calloc(numOfPoints, sizeof(double *));
-    customAssert(P != NULL);
-    for (row = 0; row < numOfPoints; row++)
-    {
-        P[row] = calloc(numOfPoints, sizeof(double));
-        customAssert(P[row] != NULL);
-        P[row][row] = 1;
-    }
-    P[pivRow][pivRow] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
-    P[pivCol][pivCol] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
-    P[pivRow][pivCol] = sin(phiAngle); /* s */   /* TODO:check extreme cases */
-    P[pivCol][pivRow] = -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
-
-    return P;
-}
 
 double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
 {
@@ -357,9 +359,10 @@ void swap(EIGEN *a, EIGEN *b)
 
 int partition(EIGEN *arr, int low, int high)
 {
+    /* partition of quicksort */
+
     double pivot;
     int i, j;
-    /* -3 ,5,-9    i=1*/
     i = low - 1;
     pivot = arr[high].eigenVal;
     for (j = low; j < high; j++)
@@ -377,6 +380,8 @@ int partition(EIGEN *arr, int low, int high)
 
 void quickSortByEigenVal(EIGEN *arr, int low, int high)
 {
+    /* quick sort algorithm on EIGENS array by their eigen value value */
+
     if (low < high)
     {
         int pivotIdx;
@@ -388,6 +393,8 @@ void quickSortByEigenVal(EIGEN *arr, int low, int high)
 
 int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints)
 {
+    /* gets K by the eigen gap heuristic */
+
     int maxDiffIdx, idx;
     double maxDiff, currDiff;
     maxDiffIdx = 0;
@@ -406,6 +413,7 @@ int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints)
 
 double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k)
 {
+    /* creates a matrix that has K columns as vectors */
     int idx, rowIdx, colIdx;
     double **kVecsMat;
     kVecsMat = (double **)calloc(numOfPoints, sizeof(double *));
@@ -435,6 +443,7 @@ void printJacobiResults(int numOfPointsArg, int k, double **eigenVectorsMat, EIG
 
 void printMat(double **mat, int numOfRows, int numOfCols)
 {
+    /* prints 2D matrix */
     int rowIdx;
     int colIdx;
     for (rowIdx = 0; rowIdx < numOfRows; rowIdx++)
