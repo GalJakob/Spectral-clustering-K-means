@@ -149,30 +149,45 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
 {
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
     int rotIdx;
-    double **P, **PTranspose, **A, **ATag, **productOfPs, **kVecsMat;
+    double **P, **PTranspose, **A, **ATag, **productOfPs,
+        **kVecsMat, **PtransMultA, **tempProdOfP;
     EIGEN *sortedEIGENS;
     productOfPs = NULL;
     rotIdx = 1;
     A = LnormMat;
 
+    /*,,,Atag,,, */
     while (rotIdx <= 100)
     {
         P = buildRotMatP(A, numOfPoints);
         PTranspose = transpose(P, numOfPoints, numOfPoints);
-        ATag = multiplyMats(multiplyMats(PTranspose, A, numOfPoints), P, numOfPoints);
+        PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
+        ATag = multiplyMats(PtransMultA, P, numOfPoints);
         if (rotIdx == 1)
-        {
             productOfPs = P;
-        }
         else
+        {
+            tempProdOfP = productOfPs;
             productOfPs = multiplyMats(productOfPs, P, numOfPoints);
+            customFreeForMat(tempProdOfP, numOfPoints);
+        }
         if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
         {
+            if (rotIdx > 1)
+                customFreeForMat(P, numOfPoints);
+            customFreeForMat(PTranspose, numOfPoints);
+            customFreeForMat(PtransMultA,numOfPoints);
             break;
         }
+        if (rotIdx > 1)
+            customFreeForMat(P, numOfPoints);
+        customFreeForMat(PTranspose, numOfPoints);
+        customFreeForMat(PtransMultA,numOfPoints);
+        customFreeForMat(A,numOfPoints);
         A = ATag;
         rotIdx++;
     }
+    /* TODO:finished free in while jacobi */
 
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
     quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
