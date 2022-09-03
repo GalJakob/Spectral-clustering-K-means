@@ -19,9 +19,9 @@ void customAssert(int booleanVal)
         abort();
     }
 }
+
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg)
 {
-
     /* this functions gets the points from the input file and puts them into an array.
     in addition,computes number of points and point dimension */
 
@@ -33,8 +33,8 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     int numOfCordsIdx = 0;
     int numOfPoints = 0;
     int numOfPointsIdx = 0;
-
     FILE *filePtr;
+
     computeNumOfCordsAndPoints(&filePtr, &numOfCords, &numOfPoints, &inFileNamePtr);
 
     *numOfCordsArg = numOfCords;
@@ -44,10 +44,12 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
     customAssert(*pointArrPtr != NULL);
     filePtr = fopen(*inFileNamePtr, "r");
     customAssert(filePtr != NULL);
+
     while (fgets(line, LINE_LENGTH, filePtr))
     {
         (*pointArrPtr)[numOfPointsIdx] = (double *)malloc(numOfCords * sizeof(double));
         customAssert((*pointArrPtr)[numOfPointsIdx] != NULL);
+
         for (numOfCordsIdx = 0; numOfCordsIdx < numOfCords; numOfCordsIdx++)
         {
             if (numOfCordsIdx == 0)
@@ -57,10 +59,10 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
             cordinateVal = atof(splittedLine);
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
+
         numOfPointsIdx++;
         numOfCordsIdx = 0;
     }
-
     fclose(filePtr);
 }
 
@@ -69,13 +71,13 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     /* this function computes the dimension and number of points */
     char line[LINE_LENGTH];
     char *splittedLine;
+
     *filePtr = fopen(**inFileNamePtr, "r");
     customAssert(*filePtr != NULL);
 
     while (fgets(line, LINE_LENGTH, *filePtr))
     {
         *numOfPoints = *numOfPoints + 1;
-
         if (*numOfCords != 0)
             continue;
         else
@@ -91,33 +93,40 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
             *numOfCords = *numOfCords - 1;
         }
     }
+
     if (fclose(*filePtr) != 0)
     {
         printf("%s", "An Error Has Occurred");
-        return;
+        abort();
     }
 }
+
 int getNumOfPoints(char *fileName)
 {
+    /* gets only the number of points from a given file */
     int numOfPoints;
-    FILE *filePtr;
     char line[LINE_LENGTH];
     char *splittedLine;
+    FILE *filePtr;
+
     filePtr = fopen(fileName, "r");
     customAssert(filePtr != NULL);
+
     numOfPoints = 0;
+
     while (fgets(line, LINE_LENGTH, filePtr))
         numOfPoints++;
     if (fclose(filePtr) != 0)
     {
         printf("%s", "An Error Has Occurred");
-        return;
+        abort();
     }
     return numOfPoints;
 }
 
 double getEuclideanNorm(double *point1, double *point2, int numOfCords)
 {
+    /* calculates the euclidean norm between two points */
     int idx;
     double diffBetweenCords;
     double sum = 0;
@@ -135,6 +144,7 @@ double getEuclideanNorm(double *point1, double *point2, int numOfCords)
 
 double SumMatRow(double *matRow, int n)
 {
+    /* calculates the sum of row in matrix */
     double res;
     int i;
     res = 0;
@@ -148,6 +158,7 @@ double SumMatRow(double *matRow, int n)
 
 double **hofchit(double **ddg, int n)
 {
+    /* changes given matrix to be the inverse matrix */
     int i;
     for (i = 0; i < n; i++)
     {
@@ -158,14 +169,15 @@ double **hofchit(double **ddg, int n)
 
 double **multiplyMats(double **mat1, double **mat2, int n)
 {
+    /* calculates the mult of the mats and returns it */
     int i, j, k;
     double **res;
     res = (double **)calloc(n, sizeof(double *));
-    assert(res != NULL);
+    customAssert(res != NULL);
     for (i = 0; i < n; i++)
     {
         res[i] = (double *)calloc(n, sizeof(double));
-        assert(res[i] != NULL);
+        customAssert(res[i] != NULL);
         for (j = 0; j < n; j++)
         {
             for (k = 0; k < n; k++)
@@ -179,14 +191,15 @@ double **multiplyMats(double **mat1, double **mat2, int n)
 
 double **transpose(double **mat, int n, int k)
 {
+    /* calculates the transpose of a matrix and returns it */
     int i, j;
     double **transposeMat;
     transposeMat = (double **)calloc(k, sizeof(double *));
-    assert(transposeMat != NULL);
+    customAssert(transposeMat != NULL);
     for (i = 0; i < k; i++)
     {
         transposeMat[i] = (double *)calloc(n, sizeof(double));
-        assert(transposeMat[i] != NULL);
+        customAssert(transposeMat[i] != NULL);
         for (j = 0; j < n; j++)
         {
             transposeMat[i][j] = mat[j][i];
@@ -197,6 +210,7 @@ double **transpose(double **mat, int n, int k)
 
 double normalizedSumRow(int k, double *row)
 {
+    /* normalize the row and returns result */
     double res = 0;
     int i;
     for (i = 0; i < k; i++)
@@ -216,8 +230,6 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
 
     getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
     phiAngle = getPhiAngle(LnormMat, pivRow, pivCol);
-    /*   printf("%d\n", pivRow);
-      printf("%d\n", pivCol); */
 
     return allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
 }
@@ -225,6 +237,7 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
 void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 {
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
+
     int row, col, pivRow2, pivCol2;
     double elWithMaxAbsVal = 0;
     for (row = 0; row < numOfPoints; row++)
@@ -247,7 +260,7 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
 {
-
+    /* builds the array of EIGENS objects  */
     int idx, idxForTempVec;
     EIGEN *eigenArr;
     double *tempVec;
@@ -268,18 +281,21 @@ EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
 double arcCot(double x)
 {
     /* gets the arc cot value of x */
+
     return PI / 2 - atan(x);
 }
 
 double getPhiAngle(double **LnormMat, int pivRow, int pivCol)
 {
     /* gets the phi angle  */
+
     double PhiAngle2Times = (LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
     return arcCot(PhiAngle2Times) / 2;
 }
 double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol)
 {
     /* creates the mat in memory and completes it's build  */
+
     double **P;
     int row;
     P = calloc(numOfPoints, sizeof(double *));
@@ -300,6 +316,8 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
 
 double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
 {
+    /* sqaures each element only if he is not in main diagonal and sums it  */
+
     int row, col;
     double sum = 0;
     for (row = 0; row < numOfPoints; row++)
@@ -314,47 +332,20 @@ double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
     return sum;
 }
 
-void customFreeForMat(double **mat)
+void customFreeForMat(double **mat, int numOf1Dptrs)
 {
     /* frees memory for mat*/
-    free(mat[0]);
+
+    int ptrIdx;
+    for (ptrIdx = 0; ptrIdx < numOf1Dptrs; ptrIdx++)
+        free(mat[ptrIdx]);
     free(mat);
 }
-double **multiplyMatWithVector(double **mat1, double **vec, int n)
-{
 
-    int i, j, k, p;
-    double **res;
-    res = (double **)calloc(n, sizeof(double *));
-    assert(res != NULL);
-    for (i = 0; i < n; i++)
-    {
-        res[i] = (double *)calloc(1, sizeof(double));
-        assert(res[i] != NULL);
-    }
-    for (p = 0; p < n; p++)
-    {
-        for (j = 0; j < 1; j++)
-        {
-            for (k = 0; k < n; k++)
-            {
-                res[p][j] += mat1[p][k] * vec[k][j];
-            }
-        }
-    }
-    return res;
-}
-
-/*
-void appendRotMat(double ****allRotMatsPtr, double **P)
-{
-   *allRotMatsPtr = calloc(sizeof(double **), 1);
-}
-*/
 
 void swap(EIGEN *a, EIGEN *b)
 {
-
+    /* swaps the EIGENS in quicksort algorithm */
     EIGEN *temp;
     temp = malloc(sizeof(EIGEN));
     customAssert(temp != NULL);

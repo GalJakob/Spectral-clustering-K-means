@@ -1,14 +1,14 @@
-
-
 #ifndef LINKED_LIST_H_INCLUDED
 #define LINKED_LIST_H_INCLUDED
-/* typedef  */
+
+/* typedefs  */
 struct eigensOfMat
 {
     double eigenVal;
     double *eigenVec;
 };
 typedef struct eigensOfMat EIGEN;
+
 /* major functions */
 double** execByGoal(int k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
@@ -28,11 +28,11 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
 double arcCot(double x);
 double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
 double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol);
-void customFreeForMat(double **mat);
+void customFreeForMat(double **mat, int columns);
+void customAssert(int booleanVal);
 double **multiplyMats(double **mat1, double **mat2, int n);
 double **transpose(double **mat, int n, int k);
 double normalizedSumRow(int k, double *row);
-double **multiplyMatWithVector(double **mat1, double **vec, int n);
 int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints);
 double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k);
 int getNumOfPoints(char *fileName);

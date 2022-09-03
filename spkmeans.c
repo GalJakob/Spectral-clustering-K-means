@@ -9,16 +9,17 @@
 #include <assert.h>
 #include "spkmeans.h"
 #include "utils.c"
-#define EPSILON 0.00001
-/* EPSILON 0.00001 */
-#define MAX_ROTATIONS 100
 
+#define EPSILON 0.00001
+#define MAX_ROTATIONS 100
 
 int main(int argc, char *argv[])
 {
+    /* this function is called if the spkmeans.c is called via cmd  */
     int k;
     char *goal;
     char *fileName;
+
     if (argc == 4)
     {
         k = atoi(argv[1]);
@@ -31,8 +32,8 @@ int main(int argc, char *argv[])
 
 double **execByGoal(int k, char *goal, char *filename)
 {
-    /* executes by given goal,and stops at goal */
-    /* base variables */
+    /* executes by given goal, and stops at goal */
+
     int numOfPointsArg, numOfCordsArg;
     double **pointArrPtr;
     double **weightedAdjMat;
@@ -46,29 +47,48 @@ double **execByGoal(int k, char *goal, char *filename)
     finalMat = NULL;
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
-    if (!strcmp(goal, "jacobi")) /*  if goal is jacobi */
+
+    if (!strcmp(goal, "jacobi"))
     {
         performJacobiAlg(pointArrPtr, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
         printJacobiResults(numOfPointsArg, k, eigenVectorsMat, sortedEigensPtr);
-        /*         freeMatrix(matrix);
-                 freeMatrix(eigenvectorsMatrix); */
+
+        customFreeForMat(pointArrPtr, numOfPointsArg);
+        customFreeForMat(eigenVectorsMat, numOfPointsArg);
+        free(sortedEigensPtr);
     }
     else /* all other goals are part of spk */
     {
         createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
         if (!strcmp(goal, "wam"))
+        {
             printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
+            customFreeForMat(pointArrPtr, numOfPointsArg);
+            customFreeForMat(weightedAdjMat, numOfPointsArg);
+        }
+
         else
         {
             createDiagonalDegreeMat(&diagonalDegreeMat, &weightedAdjMat, numOfPointsArg);
             if (!strcmp(goal, "ddg"))
+            {
                 printMat(diagonalDegreeMat, numOfPointsArg, numOfPointsArg);
+                customFreeForMat(pointArrPtr, numOfPointsArg);
+                customFreeForMat(weightedAdjMat, numOfPointsArg);
+                customFreeForMat(diagonalDegreeMat, numOfPointsArg);
+            }
+
             else
             {
-                
                 createTheNormalizedGraphLaplacian(&LnormMat, &weightedAdjMat, &diagonalDegreeMat, numOfPointsArg);
                 if (!strcmp(goal, "lnorm"))
+                {
                     printMat(LnormMat, numOfPointsArg, numOfPointsArg);
+                    customFreeForMat(pointArrPtr, numOfPointsArg);
+                    customFreeForMat(weightedAdjMat, numOfPointsArg);
+                    customFreeForMat(diagonalDegreeMat, numOfPointsArg);
+                    customFreeForMat(LnormMat, numOfPointsArg);
+                }
                 else /* spk */
                 {
                     performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
@@ -82,11 +102,11 @@ double **execByGoal(int k, char *goal, char *filename)
         return finalMat;
     else
         return NULL;
-
 }
 
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords)
 {
+    /* creates weighted adjecency matrix */
     int i, rowIdx, colIdx;
     double nodeVal;
     *weightedAdjMat = calloc(*numOfPoints, sizeof(double *));
@@ -113,8 +133,7 @@ void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *
 
 void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 {
-
-    /**/
+    /* creates diagonal degree matrix */
     int i;
     *ddg = (double **)calloc(n, sizeof(double *));
     customAssert(*ddg != NULL);
@@ -128,7 +147,6 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 
 void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat, EIGEN **sortedEigensPtr)
 {
-
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
     int rotIdx;
     double **P, **PTranspose, **A, **ATag, **productOfPs, **kVecsMat;
@@ -167,18 +185,16 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
 
 void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
 {
+    /* creates renormalized matrix from a given one */
     int i, j;
-    /*create zero mat*/
-
-   /*  *jacobi = transpose(*jacobi, n, *k); */
 
     *mat = (double **)calloc(n, sizeof(double *));
-    assert(*mat != NULL);
+    customAssert(*mat != NULL);
     for (i = 0; i < n; i++)
     {
         (*mat)[i] = (double *)calloc(*k, sizeof(double));
 
-        assert((*mat)[i] != NULL);
+        customAssert((*mat)[i] != NULL);
         for (j = 0; j < *k; j++)
         {
             (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(*k, (*jacobi)[i]);
@@ -188,14 +204,14 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
 
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n)
 {
+    /*creates normalized graph laplacian*/
     int i, j, k;
-    /*create zero mat*/
     *lnorm = (double **)calloc(n, sizeof(double *));
-    assert(*lnorm != NULL);
+    customAssert(*lnorm != NULL);
     for (i = 0; i < n; i++)
     {
         (*lnorm)[i] = (double *)calloc(n, sizeof(double));
-        assert((*lnorm)[i] != NULL);
+        customAssert((*lnorm)[i] != NULL);
     }
     *ddg = hofchit(*ddg, n);
     *lnorm = multiplyMats(*ddg, *wam, n);
@@ -216,4 +232,3 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
         }
     }
 }
-
