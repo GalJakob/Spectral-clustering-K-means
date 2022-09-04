@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-double **execByGoal(int k, char *goal, char *filename)
+double **execByGoal(int *k, char *goal, char *filename)
 {
     /* executes by given goal, and stops at goal */
 
@@ -50,8 +50,8 @@ double **execByGoal(int k, char *goal, char *filename)
 
     if (!strcmp(goal, "jacobi"))
     {
-        performJacobiAlg(pointArrPtr, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
-        printJacobiResults(numOfPointsArg, k, eigenVectorsMat, sortedEigensPtr);
+        performJacobiAlg(pointArrPtr, numOfPointsArg, &(*k), &eigenVectorsMat, &sortedEigensPtr);
+        printJacobiResults(numOfPointsArg, *k, eigenVectorsMat, sortedEigensPtr);
 
         customFreeForMat(pointArrPtr, numOfPointsArg);
         customFreeForMat(eigenVectorsMat, numOfPointsArg);
@@ -91,15 +91,16 @@ double **execByGoal(int k, char *goal, char *filename)
                 }
                 else /* spk */
                 {
-                    performJacobiAlg(LnormMat, numOfPointsArg, &k, &eigenVectorsMat, &sortedEigensPtr);
-                    createRenormalizedMat(&finalMat, &eigenVectorsMat, &k, numOfPointsArg);
+                    performJacobiAlg(LnormMat, numOfPointsArg, &(*k), &eigenVectorsMat, &sortedEigensPtr);
+                    createRenormalizedMat(&finalMat, &eigenVectorsMat, **(&k), numOfPointsArg);
                 }
             }
         }
     }
 
-    if (!strcmp(goal, "spk"))
+    if (!strcmp(goal, "spk")){
         return finalMat;
+    }
     else
         return NULL;
 }
@@ -147,6 +148,7 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 
 void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat, EIGEN **sortedEigensPtr)
 {
+    /* DELETE AFTER: lnormat good */
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
     int rotIdx;
     double **P, **PTranspose, **A, **ATag, **productOfPs,
@@ -156,7 +158,6 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
     rotIdx = 1;
     A = LnormMat;
 
-    /*,,,Atag,,, */
     while (rotIdx <= 100)
     {
         P = buildRotMatP(A, numOfPoints);
@@ -187,8 +188,6 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         A = ATag;
         rotIdx++;
     }
-    /* TODO:finished free in while jacobi */
-
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
     quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
     if (!(*k))
@@ -198,7 +197,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
     *sortedEigensPtr = sortedEIGENS;
 }
 
-void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
+void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
 {
     /* creates renormalized matrix from a given one */
     int i, j;
@@ -207,12 +206,12 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n)
     customAssert(*mat != NULL);
     for (i = 0; i < n; i++)
     {
-        (*mat)[i] = (double *)calloc(*k, sizeof(double));
+        (*mat)[i] = (double *)calloc(k, sizeof(double));
 
         customAssert((*mat)[i] != NULL);
-        for (j = 0; j < *k; j++)
+        for (j = 0; j < k; j++)
         {
-            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(*k, (*jacobi)[i]);
+            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(k, (*jacobi)[i]);
         }
     }
 }
@@ -234,8 +233,8 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
     *lnorm = multiplyMats(*ddg, *wam, n);
     tempLnorm = *lnorm;
     *lnorm = multiplyMats(*lnorm, *ddg, n);
-    customFreeForMat(tempDdg,n);
-    customFreeForMat(tempLnorm,n);
+    customFreeForMat(tempDdg, n);
+    customFreeForMat(tempLnorm, n);
 
     for (j = 0; j < n; j++)
     {

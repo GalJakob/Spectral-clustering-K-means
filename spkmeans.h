@@ -10,12 +10,12 @@ struct eigensOfMat
 typedef struct eigensOfMat EIGEN;
 
 /* major functions */
-double** execByGoal(int k, char *goal, char *filename);
+double** execByGoal(int *k, char *goal, char *filename);
 void createWeightedAdjMat(double ***weightedAdjMat, double ***pointArrPtr, int *numOfPoints, int *numOfCords);
 void createDiagonalDegreeMat(double ***res, double ***mat, int n);
 void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double ***ddg, int n);
 void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat, EIGEN **sortedEigensPtr);
-void createRenormalizedMat(double ***mat, double ***jacobi, int *k, int n);
+void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n);
 
 /* utils functions */
 void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsArg, int *numOfCordsArg);

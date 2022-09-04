@@ -296,6 +296,7 @@ EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
 
         eigenArr[idx].eigenVec = tempVec;
         eigenArr[idx].eigenVal = A[idx][idx];
+        printf("%f\n", A[idx][idx]);
     }
     return eigenArr;
 }
@@ -397,10 +398,10 @@ int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints)
     int maxDiffIdx, idx;
     double maxDiff, currDiff;
     maxDiffIdx = 0;
-    maxDiff = EIGENS[1].eigenVal - EIGENS[0].eigenVal;
+    maxDiff = EIGENS[0].eigenVal - EIGENS[1].eigenVal;
     for (idx = 1; idx < numOfPoints / 2; idx++)
     {
-        currDiff = EIGENS[idx + 1].eigenVal - EIGENS[idx].eigenVal;
+        currDiff = EIGENS[idx].eigenVal - EIGENS[idx+1].eigenVal;
         if (currDiff > maxDiff)
         {
             maxDiffIdx = idx;

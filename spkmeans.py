@@ -54,12 +54,13 @@ def main():
     fileName = sys.argv[3]
 
     nKMat = spkmeansmodule.execByGoalFromPy(k, goal, fileName)
+    print(nKMat)
     if(nKMat!=None):
+        return
         pointsArrNP = np.array(nKMat)
         clusters = kMeansPP(pointsArrNP,len(pointsArrNP),k)
         datapoints_np = pointsArrNP.tolist()
         centroids = spkmeansmodule.fit(datapoints_np, clusters, k, len(datapoints_np),len(datapoints_np[0]))
-        print("huibib",centroids)
 
 if __name__ == '__main__':
     main()

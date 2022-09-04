@@ -79,7 +79,7 @@ static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
         return NULL;
 
     numOfPoints = getNumOfPoints(fileName);
-    nKMatForKmeansPP = execByGoal(k, goal, fileName);
+    nKMatForKmeansPP = execByGoal(&k, goal, fileName);
     if (nKMatForKmeansPP == NULL)
         Py_RETURN_NONE;
     else
