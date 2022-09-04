@@ -98,7 +98,8 @@ double **execByGoal(int *k, char *goal, char *filename)
         }
     }
 
-    if (!strcmp(goal, "spk")){
+    if (!strcmp(goal, "spk"))
+    {
         return finalMat;
     }
     else
@@ -160,6 +161,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
 
     while (rotIdx <= 100)
     {
+        
         P = buildRotMatP(A, numOfPoints);
         PTranspose = transpose(P, numOfPoints, numOfPoints);
         PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
@@ -170,21 +172,21 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         {
             tempProdOfP = productOfPs;
             productOfPs = multiplyMats(productOfPs, P, numOfPoints);
-            customFreeForMat(tempProdOfP, numOfPoints);
+             customFreeForMat(tempProdOfP, numOfPoints);
         }
         if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
         {
-            if (rotIdx > 1)
-                customFreeForMat(P, numOfPoints);
-            customFreeForMat(PTranspose, numOfPoints);
-            customFreeForMat(PtransMultA, numOfPoints);
+             if (rotIdx > 1)
+                 customFreeForMat(P, numOfPoints);
+             customFreeForMat(PTranspose, numOfPoints);
+             customFreeForMat(PtransMultA, numOfPoints);
             break;
         }
-        if (rotIdx > 1)
-            customFreeForMat(P, numOfPoints);
-        customFreeForMat(PTranspose, numOfPoints);
-        customFreeForMat(PtransMultA, numOfPoints);
-        customFreeForMat(A, numOfPoints);
+          if (rotIdx > 1)
+              customFreeForMat(P, numOfPoints);
+          customFreeForMat(PTranspose, numOfPoints);
+          customFreeForMat(PtransMultA, numOfPoints);
+          customFreeForMat(A, numOfPoints);
         A = ATag;
         rotIdx++;
     }
@@ -242,11 +244,16 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
         {
             if (j == k)
             {
-                (*lnorm)[j][k] = 1 - (*lnorm)[j][k];
+                if (!((*lnorm)[j][k]))
+                    (*lnorm)[j][k] = 1;
+                else
+                    (*lnorm)[j][k] = 1 - (*lnorm)[j][k];
             }
             else
             {
-                (*lnorm)[j][k] = 0 - (*lnorm)[j][k];
+                if (!((*lnorm)[j][k]))
+                    continue;
+                (*lnorm)[j][k] = -(*lnorm)[j][k];
             }
         }
     }

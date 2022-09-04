@@ -247,10 +247,10 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
-    P[pivRow][pivRow] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
-    P[pivCol][pivCol] = cos(phiAngle); /* c */   /* TODO:check extreme cases and division by 0 */
-    P[pivRow][pivCol] = sin(phiAngle); /* s */   /* TODO:check extreme cases */
-    P[pivCol][pivRow] = -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
+    P[pivRow][pivRow] = cos(phiAngle); /* c */                            /* TODO:check extreme cases and division by 0 */
+    P[pivCol][pivCol] = cos(phiAngle); /* c */                            /* TODO:check extreme cases and division by 0 */
+    P[pivRow][pivCol] = sin(phiAngle); /* s */                            /* TODO:check extreme cases */
+    P[pivCol][pivRow] = sin(phiAngle) == 0 ? 0 : -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
     /* TODO:check where can free */
 
     return P;
@@ -344,7 +344,6 @@ void customFreeForMat(double **mat, int numOf1Dptrs)
     free(mat);
 }
 
-
 void swap(EIGEN *a, EIGEN *b)
 {
     /* swaps the EIGENS in quicksort algorithm */
@@ -401,7 +400,7 @@ int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints)
     maxDiff = EIGENS[0].eigenVal - EIGENS[1].eigenVal;
     for (idx = 1; idx < numOfPoints / 2; idx++)
     {
-        currDiff = EIGENS[idx].eigenVal - EIGENS[idx+1].eigenVal;
+        currDiff = EIGENS[idx].eigenVal - EIGENS[idx + 1].eigenVal;
         if (currDiff > maxDiff)
         {
             maxDiffIdx = idx;

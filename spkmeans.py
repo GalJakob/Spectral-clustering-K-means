@@ -8,9 +8,6 @@ np.random.seed(0)
 
 def kMeansPP(dataPoints,n,k):
     """ creates k centroids for kMeans algorithm """
-    print(dataPoints)
-    print(k)
-    print(n)
     pdPoints = pd.DataFrame(dataPoints)
     pdPoints.insert(0, "0", [i for i in range(n)], True)
 
