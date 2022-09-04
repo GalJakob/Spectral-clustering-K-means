@@ -8,6 +8,9 @@ np.random.seed(0)
 
 def kMeansPP(dataPoints,n,k):
     """ creates k centroids for kMeans algorithm """
+    print(dataPoints)
+    print(k)
+    print(n)
     pdPoints = pd.DataFrame(dataPoints)
     pdPoints.insert(0, "0", [i for i in range(n)], True)
 
@@ -54,13 +57,15 @@ def main():
     fileName = sys.argv[3]
 
     nKMat = spkmeansmodule.execByGoalFromPy(k, goal, fileName)
-    print(nKMat)
     if(nKMat!=None):
-        return
+        
         pointsArrNP = np.array(nKMat)
-        clusters = kMeansPP(pointsArrNP,len(pointsArrNP),k)
+        clusters = kMeansPP(pointsArrNP,len(pointsArrNP),len(nKMat[0]))
+        print(clusters)
         datapoints_np = pointsArrNP.tolist()
-        centroids = spkmeansmodule.fit(datapoints_np, clusters, k, len(datapoints_np),len(datapoints_np[0]))
+        centroids = spkmeansmodule.fit(datapoints_np, clusters, len(nKMat[0]), len(datapoints_np),len(datapoints_np[0]))
+        print(centroids)
+        
 
 if __name__ == '__main__':
     main()
