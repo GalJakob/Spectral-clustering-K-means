@@ -176,14 +176,14 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
             if (rotIdx > 1)
                 customFreeForMat(P, numOfPoints);
             customFreeForMat(PTranspose, numOfPoints);
-            customFreeForMat(PtransMultA,numOfPoints);
+            customFreeForMat(PtransMultA, numOfPoints);
             break;
         }
         if (rotIdx > 1)
             customFreeForMat(P, numOfPoints);
         customFreeForMat(PTranspose, numOfPoints);
-        customFreeForMat(PtransMultA,numOfPoints);
-        customFreeForMat(A,numOfPoints);
+        customFreeForMat(PtransMultA, numOfPoints);
+        customFreeForMat(A, numOfPoints);
         A = ATag;
         rotIdx++;
     }
@@ -221,6 +221,7 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
 {
     /*creates normalized graph laplacian*/
     int i, j, k;
+    double **tempLnorm, **tempDdg;
     *lnorm = (double **)calloc(n, sizeof(double *));
     customAssert(*lnorm != NULL);
     for (i = 0; i < n; i++)
@@ -228,9 +229,13 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
         (*lnorm)[i] = (double *)calloc(n, sizeof(double));
         customAssert((*lnorm)[i] != NULL);
     }
+    tempDdg = *ddg;
     *ddg = hofchit(*ddg, n);
     *lnorm = multiplyMats(*ddg, *wam, n);
+    tempLnorm = *lnorm;
     *lnorm = multiplyMats(*lnorm, *ddg, n);
+    customFreeForMat(tempDdg,n);
+    customFreeForMat(tempLnorm,n);
 
     for (j = 0; j < n; j++)
     {

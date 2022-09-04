@@ -106,7 +106,6 @@ int getNumOfPoints(char *fileName)
     /* gets only the number of points from a given file */
     int numOfPoints;
     char line[LINE_LENGTH];
-    char *splittedLine;
     FILE *filePtr;
 
     filePtr = fopen(fileName, "r");
