@@ -9,6 +9,7 @@
 
 #define LINE_LENGTH 256
 #define PI 3.141592653589793
+#define EPSILON 0.00001
 
 void customAssert(int booleanVal)
 {
@@ -56,7 +57,9 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
                 splittedLine = strtok(line, ",");
             else
                 splittedLine = strtok(NULL, ",");
-            cordinateVal = atof(splittedLine);
+           /*  printf("aaa   %s",splittedLine);
+            exit(1); */
+            cordinateVal = strtod(splittedLine,&splittedLine);
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
 
@@ -64,6 +67,8 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
         numOfCordsIdx = 0;
     }
     fclose(filePtr);
+    /* printMat(*pointArrPtr,numOfPoints,numOfPoints);
+    exit(1); */
 }
 
 void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoints, char ***inFileNamePtr)
@@ -247,10 +252,10 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
-    P[pivRow][pivRow] = cos(phiAngle); /* c */                            /* TODO:check extreme cases and division by 0 */
-    P[pivCol][pivCol] = cos(phiAngle); /* c */                            /* TODO:check extreme cases and division by 0 */
-    P[pivRow][pivCol] = sin(phiAngle); /* s */                            /* TODO:check extreme cases */
-    P[pivCol][pivRow] = sin(phiAngle) == 0 ? 0 : -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
+    P[pivRow][pivRow] = fabs(cos(phiAngle)) <= 0.001? 0 : cos(phiAngle); /* c */         /* TODO:check extreme cases and division by 0 */
+    P[pivCol][pivCol] = fabs(cos(phiAngle)) <= 0.001 ? 0 : cos(phiAngle); /* c */         /* TODO:check extreme cases and division by 0 */
+    P[pivRow][pivCol] = fabs(sin(phiAngle)) <= 0.001 ? 0 : sin(phiAngle);                /* TODO:check extreme cases */
+    P[pivCol][pivRow] = fabs(sin(phiAngle)) <= 0.001 ? 0 : -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
     /* TODO:check where can free */
 
     return P;
@@ -296,7 +301,6 @@ EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
 
         eigenArr[idx].eigenVec = tempVec;
         eigenArr[idx].eigenVal = A[idx][idx];
-        printf("%f\n", A[idx][idx]);
     }
     return eigenArr;
 }

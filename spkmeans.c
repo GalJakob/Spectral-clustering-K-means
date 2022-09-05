@@ -10,6 +10,7 @@
 #include "spkmeans.h"
 #include "utils.c"
 
+
 #define EPSILON 0.00001
 #define MAX_ROTATIONS 100
 
@@ -47,9 +48,9 @@ double **execByGoal(int *k, char *goal, char *filename)
     finalMat = NULL;
 
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
-
     if (!strcmp(goal, "jacobi"))
     {
+
         performJacobiAlg(pointArrPtr, numOfPointsArg, &(*k), &eigenVectorsMat, &sortedEigensPtr);
         printJacobiResults(numOfPointsArg, *k, eigenVectorsMat, sortedEigensPtr);
 
@@ -160,6 +161,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
     A = LnormMat;
     while (rotIdx <= 100)
     {
+
         P = buildRotMatP(A, numOfPoints);
         PTranspose = transpose(P, numOfPoints, numOfPoints);
         PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
@@ -170,21 +172,21 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         {
             tempProdOfP = productOfPs;
             productOfPs = multiplyMats(productOfPs, P, numOfPoints);
-             customFreeForMat(tempProdOfP, numOfPoints);
+            customFreeForMat(tempProdOfP, numOfPoints);
         }
         if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
         {
-             if (rotIdx > 1)
-                 customFreeForMat(P, numOfPoints);
-             customFreeForMat(PTranspose, numOfPoints);
-             customFreeForMat(PtransMultA, numOfPoints);
+            if (rotIdx > 1)
+                customFreeForMat(P, numOfPoints);
+            customFreeForMat(PTranspose, numOfPoints);
+            customFreeForMat(PtransMultA, numOfPoints);
             break;
         }
-          if (rotIdx > 1)
-              customFreeForMat(P, numOfPoints);
-          customFreeForMat(PTranspose, numOfPoints);
-          customFreeForMat(PtransMultA, numOfPoints);
-          customFreeForMat(A, numOfPoints);
+        if (rotIdx > 1)
+            customFreeForMat(P, numOfPoints);
+        customFreeForMat(PTranspose, numOfPoints);
+        customFreeForMat(PtransMultA, numOfPoints);
+        customFreeForMat(A, numOfPoints);
         A = ATag;
         rotIdx++;
     }
@@ -194,6 +196,7 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
     kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
     *eigenVecsMat = kVecsMat;
+   /*  printMat(kVecsMat,numOfPoints,*k); */
     *sortedEigensPtr = sortedEIGENS;
 }
 
@@ -233,6 +236,7 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
     *lnorm = multiplyMats(*ddg, *wam, n);
     tempLnorm = *lnorm;
     *lnorm = multiplyMats(*lnorm, *ddg, n);
+
     customFreeForMat(tempDdg, n);
     customFreeForMat(tempLnorm, n);
 
@@ -242,15 +246,20 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
         {
             if (j == k)
             {
-                if (!((*lnorm)[j][k]))
+                if ((*lnorm)[j][k])
                     (*lnorm)[j][k] = 1;
                 else
                     (*lnorm)[j][k] = 1 - (*lnorm)[j][k];
             }
             else
             {
-                if (!((*lnorm)[j][k]))
+                if ((*lnorm)[j][k]<EPSILON)
+                {
+                    /* printf("asdsad %f", (*lnorm)[j][k]);
+                    exit(1); */
+                    (*lnorm)[j][k] = 0;
                     continue;
+                }
                 (*lnorm)[j][k] = -(*lnorm)[j][k];
             }
         }
