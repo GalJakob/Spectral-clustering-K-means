@@ -158,10 +158,8 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
     productOfPs = NULL;
     rotIdx = 1;
     A = LnormMat;
-
     while (rotIdx <= 100)
     {
-        
         P = buildRotMatP(A, numOfPoints);
         PTranspose = transpose(P, numOfPoints, numOfPoints);
         PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
