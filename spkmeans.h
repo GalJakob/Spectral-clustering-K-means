@@ -27,7 +27,7 @@ double **buildRotMatP(double **LnormMat, int numOfPoints);
 void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol);
 double arcCot(double x);
 double getPhiAngle(double **LnormMat, int pivRow, int pivCol);
-double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol);
+double **allocateAndCreateP(double** LnormMat,double phiAngle, int numOfPoints, int pivRow, int pivCol);
 void customFreeForMat(double **mat, int columns);
 void customAssert(int booleanVal);
 double **multiplyMats(double **mat1, double **mat2, int n);

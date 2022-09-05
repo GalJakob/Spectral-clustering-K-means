@@ -46,11 +46,9 @@ double **execByGoal(int *k, char *goal, char *filename)
     eigenVectorsMat = NULL;
     sortedEigensPtr = NULL;
     finalMat = NULL;
-
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     if (!strcmp(goal, "jacobi"))
     {
-
         performJacobiAlg(pointArrPtr, numOfPointsArg, &(*k), &eigenVectorsMat, &sortedEigensPtr);
         printJacobiResults(numOfPointsArg, *k, eigenVectorsMat, sortedEigensPtr);
 
@@ -161,7 +159,6 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
     A = LnormMat;
     while (rotIdx <= 100)
     {
-
         P = buildRotMatP(A, numOfPoints);
         PTranspose = transpose(P, numOfPoints, numOfPoints);
         PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
@@ -190,6 +187,8 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         A = ATag;
         rotIdx++;
     }
+    printMat(productOfPs,numOfPoints,*k);
+    printf("dsadsa \n");
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
     quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
     if (!(*k))
@@ -253,8 +252,10 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
             }
             else
             {
+
                 if ((*lnorm)[j][k]<EPSILON)
                 {
+
                     /* printf("asdsad %f", (*lnorm)[j][k]);
                     exit(1); */
                     (*lnorm)[j][k] = 0;

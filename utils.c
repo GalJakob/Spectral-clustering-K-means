@@ -8,7 +8,7 @@
 #include "spkmeans.h"
 
 #define LINE_LENGTH 256
-#define PI 3.141592653589793
+#define PI 3.141592653589793238
 #define EPSILON 0.00001
 
 void customAssert(int booleanVal)
@@ -28,7 +28,6 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
 
     char line[LINE_LENGTH];
     char *splittedLine;
-
     double cordinateVal;
     int numOfCords = 0;
     int numOfCordsIdx = 0;
@@ -57,12 +56,11 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
                 splittedLine = strtok(line, ",");
             else
                 splittedLine = strtok(NULL, ",");
-           /*  printf("aaa   %s",splittedLine);
-            exit(1); */
-            cordinateVal = strtod(splittedLine,&splittedLine);
+            /*  printf("aaa   %s",splittedLine);
+             exit(1); */
+            cordinateVal = strtod(splittedLine, &splittedLine);
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
-
         numOfPointsIdx++;
         numOfCordsIdx = 0;
     }
@@ -235,13 +233,24 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
     getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
     phiAngle = getPhiAngle(LnormMat, pivRow, pivCol);
 
-    return allocateAndCreateP(phiAngle, numOfPoints, pivRow, pivCol);
+    return allocateAndCreateP(LnormMat, phiAngle, numOfPoints, pivRow, pivCol);
 }
 
-double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pivCol)
+double **allocateAndCreateP(double **LnormMat, double phiAngle, int numOfPoints, int pivRow, int pivCol)
 {
     /* creates the mat in memory and completes it's build  */
-
+    double theta,t,c,s;
+    theta =(LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
+    if (theta >= 0)
+    {
+        t = 1 / (theta + sqrt(pow(theta, 2) + 1));
+    }
+    else
+    {
+        t = -1 / (-theta + sqrt(pow(theta, 2) + 1));
+    }
+    c = 1 / sqrt(pow(t, 2) + 1);
+    s = t * c;
     double **P;
     int row;
     P = calloc(numOfPoints, sizeof(double *));
@@ -252,10 +261,10 @@ double **allocateAndCreateP(double phiAngle, int numOfPoints, int pivRow, int pi
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
-    P[pivRow][pivRow] = fabs(cos(phiAngle)) <= 0.001? 0 : cos(phiAngle); /* c */         /* TODO:check extreme cases and division by 0 */
-    P[pivCol][pivCol] = fabs(cos(phiAngle)) <= 0.001 ? 0 : cos(phiAngle); /* c */         /* TODO:check extreme cases and division by 0 */
-    P[pivRow][pivCol] = fabs(sin(phiAngle)) <= 0.001 ? 0 : sin(phiAngle);                /* TODO:check extreme cases */
-    P[pivCol][pivRow] = fabs(sin(phiAngle)) <= 0.001 ? 0 : -sin(phiAngle); /* -s */ /* TODO:check extreme cases */
+    P[pivRow][pivRow] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
+    P[pivCol][pivCol] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
+    P[pivRow][pivCol] = s; /* <= 0.001 ? 0 : sin(phiAngle); */         /* TODO:check extreme cases */
+    P[pivCol][pivRow] = -s ; /* -s */          /* TODO:check extreme cases */
     /* TODO:check where can free */
 
     return P;
@@ -266,6 +275,8 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
 
     int row, col, pivRow2, pivCol2;
+    pivCol2 = 0;
+    pivRow2 = 0;
     double elWithMaxAbsVal = 0;
     for (row = 0; row < numOfPoints; row++)
     {
