@@ -80,8 +80,7 @@ static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
 
     numOfPoints = getNumOfPoints(fileName);
     nKMatForKmeansPP = execByGoal(&k, goal, fileName);
-    /* printMat(nKMatForKmeansPP,numOfPoints,k);
-    exit(1); */
+   /*  printMat(nKMatForKmeansPP,numOfPoints,k); */
     if (nKMatForKmeansPP == NULL)
         Py_RETURN_NONE;
     else
@@ -220,7 +219,7 @@ static PyObject *KmeansAlgorithm(double ***pointsArrPtr, double ***centroidsArrP
         free(normDistances);
         iterCnt++;
     }
-    
+    printMat(*centroidsArrPtr,K,numOfCords);
     return createPyMat(*centroidsArrPtr, K, numOfCords);
 }
 

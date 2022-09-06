@@ -10,7 +10,6 @@
 #include "spkmeans.h"
 #include "utils.c"
 
-
 #define EPSILON 0.00001
 #define MAX_ROTATIONS 100
 
@@ -26,7 +25,7 @@ int main(int argc, char *argv[])
         k = atoi(argv[1]);
         goal = argv[2];
         fileName = argv[3];
-        execByGoal(k, goal, fileName);
+        execByGoal(&k, goal, fileName);
     }
     return 0;
 }
@@ -46,6 +45,7 @@ double **execByGoal(int *k, char *goal, char *filename)
     eigenVectorsMat = NULL;
     sortedEigensPtr = NULL;
     finalMat = NULL;
+
     assignPoints(&pointArrPtr, &filename, &numOfPointsArg, &numOfCordsArg);
     if (!strcmp(goal, "jacobi"))
     {
@@ -187,15 +187,12 @@ void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eige
         A = ATag;
         rotIdx++;
     }
-    printMat(productOfPs,numOfPoints,*k);
-    printf("dsadsa \n");
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
     quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
     if (!(*k))
         *k = getKeigengapHeuristic(sortedEIGENS, numOfPoints);
     kVecsMat = createKVecsMat(sortedEIGENS, numOfPoints, *k);
     *eigenVecsMat = kVecsMat;
-   /*  printMat(kVecsMat,numOfPoints,*k); */
     *sortedEigensPtr = sortedEIGENS;
 }
 
@@ -203,6 +200,7 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
 {
     /* creates renormalized matrix from a given one */
     int i, j;
+    double sumRow = 0;
 
     *mat = (double **)calloc(n, sizeof(double *));
     customAssert(*mat != NULL);
@@ -211,9 +209,13 @@ void createRenormalizedMat(double ***mat, double ***jacobi, int k, int n)
         (*mat)[i] = (double *)calloc(k, sizeof(double));
 
         customAssert((*mat)[i] != NULL);
+        sumRow = normalizedSumRow(k, (*jacobi)[i]);
         for (j = 0; j < k; j++)
         {
-            (*mat)[i][j] = (*jacobi)[i][j] / normalizedSumRow(k, (*jacobi)[i]);
+            if (!sumRow)
+                (*mat)[i][j] = 0;
+            else
+                (*mat)[i][j] = (*jacobi)[i][j] / sumRow;
         }
     }
 }
@@ -253,7 +255,7 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
             else
             {
 
-                if ((*lnorm)[j][k]<EPSILON)
+                if ((*lnorm)[j][k] < EPSILON)
                 {
 
                     /* printf("asdsad %f", (*lnorm)[j][k]);

@@ -228,31 +228,24 @@ double **buildRotMatP(double **LnormMat, int numOfPoints)
 {
     /* builds the rotation matrix of the Jacobi algorithm */
     int pivRow, pivCol;
-    double phiAngle;
-
     getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
-    phiAngle = getPhiAngle(LnormMat, pivRow, pivCol);
-
-    return allocateAndCreateP(LnormMat, phiAngle, numOfPoints, pivRow, pivCol);
+    return allocateAndCreateP(LnormMat, numOfPoints, pivRow, pivCol);
 }
 
-double **allocateAndCreateP(double **LnormMat, double phiAngle, int numOfPoints, int pivRow, int pivCol)
+double **allocateAndCreateP(double **LnormMat,int numOfPoints, int pivRow, int pivCol)
 {
     /* creates the mat in memory and completes it's build  */
-    double theta,t,c,s;
-    theta =(LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
-    if (theta >= 0)
-    {
-        t = 1 / (theta + sqrt(pow(theta, 2) + 1));
-    }
-    else
-    {
-        t = -1 / (-theta + sqrt(pow(theta, 2) + 1));
-    }
-    c = 1 / sqrt(pow(t, 2) + 1);
-    s = t * c;
+    double phiAngle, t, c, s;
     double **P;
     int row;
+    phiAngle = (LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
+    if (phiAngle >= 0)
+        t = 1 / (phiAngle + sqrt(pow(phiAngle, 2) + 1));
+    else
+        t = -1 / (-phiAngle + sqrt(pow(phiAngle, 2) + 1));
+    c = 1 / sqrt(pow(t, 2) + 1);
+    s = t * c;
+
     P = calloc(numOfPoints, sizeof(double *));
     customAssert(P != NULL);
     for (row = 0; row < numOfPoints; row++)
@@ -264,7 +257,7 @@ double **allocateAndCreateP(double **LnormMat, double phiAngle, int numOfPoints,
     P[pivRow][pivRow] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
     P[pivCol][pivCol] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
     P[pivRow][pivCol] = s; /* <= 0.001 ? 0 : sin(phiAngle); */         /* TODO:check extreme cases */
-    P[pivCol][pivRow] = -s ; /* -s */          /* TODO:check extreme cases */
+    P[pivCol][pivRow] = -s; /* -s */                                   /* TODO:check extreme cases */
     /* TODO:check where can free */
 
     return P;
@@ -275,9 +268,10 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
 
     int row, col, pivRow2, pivCol2;
+    double elWithMaxAbsVal;
     pivCol2 = 0;
     pivRow2 = 0;
-    double elWithMaxAbsVal = 0;
+    elWithMaxAbsVal=0;
     for (row = 0; row < numOfPoints; row++)
     {
         for (col = row; col < numOfPoints; col++)
@@ -316,20 +310,6 @@ EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
     return eigenArr;
 }
 
-double arcCot(double x)
-{
-    /* gets the arc cot value of x */
-
-    return PI / 2 - atan(x);
-}
-
-double getPhiAngle(double **LnormMat, int pivRow, int pivCol)
-{
-    /* gets the phi angle  */
-
-    double PhiAngle2Times = (LnormMat[pivCol][pivCol] - LnormMat[pivRow][pivRow]) / (2 * LnormMat[pivRow][pivCol]);
-    return arcCot(PhiAngle2Times) / 2;
-}
 
 double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
 {

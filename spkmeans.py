@@ -13,7 +13,6 @@ def kMeansPP(dataPoints,n,k):
 
     indices = pdPoints.iloc[:, 0]
     indices_np = indices.to_numpy()
-
     datapoints = pdPoints.drop(columns="0")
     datapoints_np =datapoints.to_numpy()
 
@@ -43,6 +42,7 @@ def kMeansPP(dataPoints,n,k):
         clusters_indices.append(M)
         clusters.append(list(dictOfPtsByIdx[M]))
 
+    printClusters(clusters_indices)
     datapoints_np = datapoints.to_numpy().tolist()
     return clusters
 
@@ -55,14 +55,18 @@ def main():
 
     nKMat = spkmeansmodule.execByGoalFromPy(k, goal, fileName)
     if(nKMat!=None):
-        
         pointsArrNP = np.array(nKMat)
         clusters = kMeansPP(pointsArrNP,len(pointsArrNP),len(nKMat[0]))
-        print(clusters)
         datapoints_np = pointsArrNP.tolist()
-        centroids = spkmeansmodule.fit(datapoints_np, clusters, len(nKMat[0]), len(datapoints_np),len(datapoints_np[0]))
-        print(centroids)
-        
+        spkmeansmodule.fit(datapoints_np, clusters, len(nKMat[0]), len(datapoints_np),len(datapoints_np[0]))
+
+def printClusters(clusters_indices):
+    """ prints the clusters' clusters_indices. """
+    for idx in range(len(clusters_indices)):
+        if idx != len(clusters_indices) - 1:
+            print(int(clusters_indices[idx]), end=",")
+        else:
+            print(int(clusters_indices[idx]))
 
 if __name__ == '__main__':
     main()
