@@ -20,9 +20,8 @@ int main(int argc, char *argv[])
     char *goal;
     char *fileName;
     /*  TODO:
-    1.check extreme cases in jacobi
     2. check moodle forum
-    3.check epsilon in lnorm mat*/
+    3.check epsilon in lnorm mat and other epsilons*/
     if (argc == 4)
     {
         k = atoi(argv[1]);
@@ -64,6 +63,7 @@ double **execByGoal(int *k, char *goal, char *filename)
         createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
         if (!strcmp(goal, "wam"))
         {
+            
             printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
             customFreeForMat(pointArrPtr, numOfPointsArg);
             customFreeForMat(weightedAdjMat, numOfPointsArg);
