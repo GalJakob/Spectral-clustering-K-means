@@ -23,8 +23,8 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
 double getEuclideanNorm(double *point1, double *point2, int numOfCords);
 double SumMatRow(double *matRow, int n);
 double **hofchit(double **ddg, int n);
-double **buildRotMatP(double **LnormMat, int numOfPoints);
-void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol);
+double **buildRotMatP(double **LnormMat, int numOfPoints,double*pivotValue);
+void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol,double**pivotValue);
 double **allocateAndCreateP(double** LnormMat, int numOfPoints, int pivRow, int pivCol);
 void customFreeForMat(double **mat, int columns);
 void customAssert(int booleanVal);
@@ -34,6 +34,8 @@ double normalizedSumRow(int k, double *row);
 int getKeigengapHeuristic(EIGEN *EIGENS, int numOfPoints);
 double **createKVecsMat(EIGEN *EIGENS, int numOfPoints, int k);
 int getNumOfPoints(char *fileName);
+double **customCopy(double **mat, int rows, int cols);
+int checkIfDiagMat(double **mat, int rows, int cols);
 
 
 EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints);

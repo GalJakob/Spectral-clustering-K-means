@@ -224,15 +224,33 @@ double normalizedSumRow(int k, double *row)
     return res;
 }
 
-double **buildRotMatP(double **LnormMat, int numOfPoints)
+double **buildRotMatP(double **LnormMat, int numOfPoints, double *pivotValue)
 {
     /* builds the rotation matrix of the Jacobi algorithm */
     int pivRow, pivCol;
-    getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol);
+    getPivotAndHisIdxs(LnormMat, numOfPoints, &pivRow, &pivCol, &pivotValue);
+    if (!(*pivotValue))
+        return customCopy(LnormMat, numOfPoints, numOfPoints);
     return allocateAndCreateP(LnormMat, numOfPoints, pivRow, pivCol);
 }
+int checkIfDiagMat(double **mat, int rows, int cols)
+{
+    /* returns 0 if not diag,if diag returns 1 */
+    int idxRow, idxCol;
+    for (idxRow = 0; idxRow < rows; idxRow++)
+    {
+        for (idxCol = idxRow; idxCol < cols; idxCol++)
+        {
+            if (idxCol == idxRow)
+                continue;
+            if (mat[idxRow][idxCol])
+                return 0;
+        }
+    }
+    return 1;
+}
 
-double **allocateAndCreateP(double **LnormMat,int numOfPoints, int pivRow, int pivCol)
+double **allocateAndCreateP(double **LnormMat, int numOfPoints, int pivRow, int pivCol)
 {
     /* creates the mat in memory and completes it's build  */
     double phiAngle, t, c, s;
@@ -263,15 +281,15 @@ double **allocateAndCreateP(double **LnormMat,int numOfPoints, int pivRow, int p
     return P;
 }
 
-void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
+void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol, double **pivotValue)
 {
     /* gets the off-diagonal element of mat with largest absolute value and his row and column */
 
     int row, col, pivRow2, pivCol2;
     double elWithMaxAbsVal;
-    pivCol2 = 0;
+    pivCol2 = 1;
     pivRow2 = 0;
-    elWithMaxAbsVal=0;
+    elWithMaxAbsVal = 0;
     for (row = 0; row < numOfPoints; row++)
     {
         for (col = row; col < numOfPoints; col++)
@@ -286,6 +304,7 @@ void getPivotAndHisIdxs(double **mat, int numOfPoints, int *pivRow, int *pivCol)
             }
         }
     }
+    **pivotValue = elWithMaxAbsVal;
     *pivRow = pivRow2;
     *pivCol = pivCol2;
 }
@@ -309,7 +328,6 @@ EIGEN *buildEIGENArr(double **productOfPs, double **A, int numOfPoints)
     }
     return eigenArr;
 }
-
 
 double getSumOfSquaresOffDiag(double **mat, int numOfPoints)
 {
@@ -450,4 +468,21 @@ void printMat(double **mat, int numOfRows, int numOfCols)
                 rowIdx != numOfRows - 1 ? printf("%.4f\n", mat[rowIdx][colIdx]) : printf("%.4f", mat[rowIdx][colIdx]);
         }
     }
+}
+
+double **customCopy(double **mat, int rows, int cols)
+{
+    /* copies 2D array */
+    double **resMat;
+    int idxRow, idxCol;
+    resMat = (double **)calloc(rows, sizeof(double *));
+    customAssert(resMat != NULL);
+    for (idxRow = 0; idxRow < rows; idxRow++)
+    {
+        resMat[idxRow] = (double *)calloc(cols, sizeof(double));
+        customAssert(resMat[idxRow] != NULL);
+        for (idxCol = 0; idxCol < cols; idxCol++)
+            resMat[idxRow][idxCol] = mat[idxRow][idxCol];
+    }
+    return resMat;
 }

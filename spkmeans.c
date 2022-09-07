@@ -19,7 +19,10 @@ int main(int argc, char *argv[])
     int k;
     char *goal;
     char *fileName;
-
+    /*  TODO:
+    1.check extreme cases in jacobi
+    2. check moodle forum
+    3.check epsilon in lnorm mat*/
     if (argc == 4)
     {
         k = atoi(argv[1]);
@@ -148,44 +151,54 @@ void createDiagonalDegreeMat(double ***ddg, double ***weightedAdjMat, int n)
 
 void performJacobiAlg(double **LnormMat, int numOfPoints, int *k, double ***eigenVecsMat, EIGEN **sortedEigensPtr)
 {
-    /* DELETE AFTER: lnormat good */
     /* performs the Jacobi algorithm and gets the eigenvales and eigenvectors of Lnrom */
-    int rotIdx;
+    int rotIdx, isDiagMat;
     double **P, **PTranspose, **A, **ATag, **productOfPs,
         **kVecsMat, **PtransMultA, **tempProdOfP;
+    double pivotValue;
     EIGEN *sortedEIGENS;
     productOfPs = NULL;
     rotIdx = 1;
     A = LnormMat;
-    while (rotIdx <= 100)
+    pivotValue = 0;
+    isDiagMat = checkIfDiagMat(LnormMat, numOfPoints, numOfPoints);
+    if (isDiagMat)
     {
-        P = buildRotMatP(A, numOfPoints);
-        PTranspose = transpose(P, numOfPoints, numOfPoints);
-        PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
-        ATag = multiplyMats(PtransMultA, P, numOfPoints);
-        if (rotIdx == 1)
-            productOfPs = P;
-        else
+        P = buildRotMatP(A, numOfPoints, &pivotValue);
+        productOfPs = P;
+    }
+    else
+    {
+        while (rotIdx <= 100)
         {
-            tempProdOfP = productOfPs;
-            productOfPs = multiplyMats(productOfPs, P, numOfPoints);
-            customFreeForMat(tempProdOfP, numOfPoints);
-        }
-        if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
-        {
+            P = buildRotMatP(A, numOfPoints, &pivotValue);
+            PTranspose = transpose(P, numOfPoints, numOfPoints);
+            PtransMultA = multiplyMats(PTranspose, A, numOfPoints);
+            ATag = multiplyMats(PtransMultA, P, numOfPoints);
+            if (rotIdx == 1)
+                productOfPs = P;
+            else
+            {
+                tempProdOfP = productOfPs;
+                productOfPs = multiplyMats(productOfPs, P, numOfPoints);
+                customFreeForMat(tempProdOfP, numOfPoints);
+            }
+            if (getSumOfSquaresOffDiag(A, numOfPoints) - getSumOfSquaresOffDiag(ATag, numOfPoints) <= EPSILON)
+            {
+                if (rotIdx > 1)
+                    customFreeForMat(P, numOfPoints);
+                customFreeForMat(PTranspose, numOfPoints);
+                customFreeForMat(PtransMultA, numOfPoints);
+                break;
+            }
             if (rotIdx > 1)
                 customFreeForMat(P, numOfPoints);
             customFreeForMat(PTranspose, numOfPoints);
             customFreeForMat(PtransMultA, numOfPoints);
-            break;
+            customFreeForMat(A, numOfPoints);
+            A = ATag;
+            rotIdx++;
         }
-        if (rotIdx > 1)
-            customFreeForMat(P, numOfPoints);
-        customFreeForMat(PTranspose, numOfPoints);
-        customFreeForMat(PtransMultA, numOfPoints);
-        customFreeForMat(A, numOfPoints);
-        A = ATag;
-        rotIdx++;
     }
     sortedEIGENS = buildEIGENArr(productOfPs, A, numOfPoints);
     quickSortByEigenVal(sortedEIGENS, 0, numOfPoints - 1);
