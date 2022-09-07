@@ -19,14 +19,11 @@ int main(int argc, char *argv[])
     int k;
     char *goal;
     char *fileName;
-    /*  TODO:
-    2. check moodle forum
-    3.check epsilon in lnorm mat and other epsilons*/
-    if (argc == 4)
+    k = 0;
+    if (argc == 3)
     {
-        k = atoi(argv[1]);
-        goal = argv[2];
-        fileName = argv[3];
+        goal = argv[1];
+        fileName = argv[2];
         execByGoal(&k, goal, fileName);
     }
     return 0;
@@ -63,7 +60,7 @@ double **execByGoal(int *k, char *goal, char *filename)
         createWeightedAdjMat(&weightedAdjMat, &pointArrPtr, &numOfPointsArg, &numOfCordsArg);
         if (!strcmp(goal, "wam"))
         {
-            
+
             printMat(weightedAdjMat, numOfPointsArg, numOfPointsArg);
             customFreeForMat(pointArrPtr, numOfPointsArg);
             customFreeForMat(weightedAdjMat, numOfPointsArg);
@@ -101,9 +98,7 @@ double **execByGoal(int *k, char *goal, char *filename)
     }
 
     if (!strcmp(goal, "spk"))
-    {
         return finalMat;
-    }
     else
         return NULL;
 }
@@ -268,11 +263,8 @@ void createTheNormalizedGraphLaplacian(double ***lnorm, double ***wam, double **
             else
             {
 
-                if ((*lnorm)[j][k] < EPSILON)
+                if (((*lnorm)[j][k]) == 0)
                 {
-
-                    /* printf("asdsad %f", (*lnorm)[j][k]);
-                    exit(1); */
                     (*lnorm)[j][k] = 0;
                     continue;
                 }

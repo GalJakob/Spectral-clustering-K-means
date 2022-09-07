@@ -80,7 +80,6 @@ static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
 
     numOfPoints = getNumOfPoints(fileName);
     nKMatForKmeansPP = execByGoal(&k, goal, fileName);
-   /*  printMat(nKMatForKmeansPP,numOfPoints,k); */
     if (nKMatForKmeansPP == NULL)
         Py_RETURN_NONE;
     else
@@ -92,7 +91,6 @@ static PyObject *fit(PyObject *self, PyObject *args)
     /* like in 2nd assignment, this function calls kmeans algorithm with given centroids */
     PyObject *pyPointsArrPtr;
     PyObject *pyCentroidsArrPtr;
-    PyObject *returnedCentroids;
 
     double **pointsArr;
     double **centroidsArr;
@@ -105,10 +103,8 @@ static PyObject *fit(PyObject *self, PyObject *args)
 
     pointsArr = createCMat(pyPointsArrPtr, numOfPoints, numOfCords);
     centroidsArr = createCMat(pyCentroidsArrPtr, K, numOfCords);
-    returnedCentroids = Py_BuildValue("O", KmeansAlgorithm(&pointsArr, &centroidsArr, numOfPoints, numOfCords, K));
-    /* printCentroids(clusters, numOfFeatures); */
-    return returnedCentroids;
-    /* Py_RETURN_NONE; */
+    KmeansAlgorithm(&pointsArr, &centroidsArr, numOfPoints, numOfCords, K);
+    Py_RETURN_NONE;
 }
 
 static PyObject *KmeansAlgorithm(double ***pointsArrPtr, double ***centroidsArrPtr, int numOfPoints, int numOfCords, int K)
@@ -220,7 +216,7 @@ static PyObject *KmeansAlgorithm(double ***pointsArrPtr, double ***centroidsArrP
         iterCnt++;
     }
     printMat(*centroidsArrPtr,K,numOfCords);
-    return createPyMat(*centroidsArrPtr, K, numOfCords);
+    Py_RETURN_NONE;
 }
 
 static PyMethodDef _methods[] = {
