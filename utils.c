@@ -16,7 +16,7 @@ void customAssert(int booleanVal)
     /* asserting that no unexpected behavior is in the program*/
     if (!booleanVal)
     {
-        printf("An Error Has Occured");
+        printf("An Error Has Occured\n");
         abort();
     }
 }
