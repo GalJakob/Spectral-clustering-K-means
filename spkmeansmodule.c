@@ -79,11 +79,13 @@ static PyObject *execByGoalFromPy(PyObject *self, PyObject *args)
         return NULL;
 
     numOfPoints = getNumOfPoints(fileName);
+    if(!strcmp(goal, "jacobi"))
+        k = numOfPoints;
     nKMatForKmeansPP = execByGoal(&k, goal, fileName);
     if (nKMatForKmeansPP == NULL)
         Py_RETURN_NONE;
     else
-        return createPyMat(nKMatForKmeansPP, numOfPoints, k); /*  k rows and numofpoints cols */
+        return createPyMat(nKMatForKmeansPP, numOfPoints, k); 
 }
 
 static PyObject *fit(PyObject *self, PyObject *args)

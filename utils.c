@@ -17,7 +17,7 @@ void customAssert(int booleanVal)
     if (!booleanVal)
     {
         printf("An Error Has Occured\n");
-        abort();
+        exit(0);
     }
 }
 
@@ -56,8 +56,6 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
                 splittedLine = strtok(line, ",");
             else
                 splittedLine = strtok(NULL, ",");
-            /*  printf("aaa   %s",splittedLine);
-             exit(1); */
             cordinateVal = strtod(splittedLine, &splittedLine);
             (*pointArrPtr)[numOfPointsIdx][numOfCordsIdx] = cordinateVal;
         }
@@ -65,8 +63,6 @@ void assignPoints(double ***pointArrPtr, char **inFileNamePtr, int *numOfPointsA
         numOfCordsIdx = 0;
     }
     fclose(filePtr);
-    /* printMat(*pointArrPtr,numOfPoints,numOfPoints);
-    exit(1); */
 }
 
 void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoints, char ***inFileNamePtr)
@@ -100,7 +96,7 @@ void computeNumOfCordsAndPoints(FILE **filePtr, int *numOfCords, int *numOfPoint
     if (fclose(*filePtr) != 0)
     {
         printf("%s", "An Error Has Occurred");
-        abort();
+        exit(0);
     }
 }
 
@@ -121,7 +117,7 @@ int getNumOfPoints(char *fileName)
     if (fclose(filePtr) != 0)
     {
         printf("%s", "An Error Has Occurred");
-        abort();
+        exit(0);
     }
     return numOfPoints;
 }
@@ -272,11 +268,10 @@ double **allocateAndCreateP(double **LnormMat, int numOfPoints, int pivRow, int 
         customAssert(P[row] != NULL);
         P[row][row] = 1;
     }
-    P[pivRow][pivRow] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
-    P[pivCol][pivCol] = c; /* <EPSILON ? 0 : cos(phiAngle); */ /* c */ /* TODO:check extreme cases and division by 0 */
-    P[pivRow][pivCol] = s; /* <= 0.001 ? 0 : sin(phiAngle); */         /* TODO:check extreme cases */
-    P[pivCol][pivRow] = -s; /* -s */                                   /* TODO:check extreme cases */
-    /* TODO:check where can free */
+    P[pivRow][pivRow] = c; 
+    P[pivCol][pivCol] = c; 
+    P[pivRow][pivCol] = s; 
+    P[pivCol][pivRow] = -s; 
 
     return P;
 }

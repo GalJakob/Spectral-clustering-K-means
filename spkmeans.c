@@ -24,11 +24,14 @@ int main(int argc, char *argv[])
     {
         goal = argv[1];
         fileName = argv[2];
+        if (!strcmp(goal, "jacobi"))
+            k = getNumOfPoints(fileName);
         execByGoal(&k, goal, fileName);
     }
-    else{
+    else
+    {
         printf("Invalid Input!");
-        abort();
+        exit(0);
     }
     return 0;
 }
@@ -55,9 +58,8 @@ double **execByGoal(int *k, char *goal, char *filename)
         performJacobiAlg(pointArrPtr, numOfPointsArg, &(*k), &eigenVectorsMat, &sortedEigensPtr);
         printJacobiResults(numOfPointsArg, *k, eigenVectorsMat, sortedEigensPtr);
 
-        customFreeForMat(pointArrPtr, numOfPointsArg);
         customFreeForMat(eigenVectorsMat, numOfPointsArg);
-        free(sortedEigensPtr);
+        free(sortedEigensPtr); 
     }
     else /* all other goals are part of spk */
     {
